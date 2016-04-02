@@ -26,7 +26,7 @@ extern void run_tag(int argc, char **argv);
 extern void run_cifar(int argc, char **argv);
 extern void run_go(int argc, char **argv);
 
-void change_rate(char *filename, float scale, float add)
+static void change_rate(char *filename, float scale, float add)
 {
     // Ready for some weird shit??
     FILE *fp = fopen(filename, "r+b");
@@ -40,7 +40,7 @@ void change_rate(char *filename, float scale, float add)
     fclose(fp);
 }
 
-void average(int argc, char *argv[])
+static void average(int argc, char *argv[])
 {
     char *cfgfile = argv[2];
     char *outfile = argv[3];
@@ -86,7 +86,7 @@ void average(int argc, char *argv[])
     save_weights(sum, outfile);
 }
 
-void partial(char *cfgfile, char *weightfile, char *outfile, int max)
+static void partial(char *cfgfile, char *weightfile, char *outfile, int max)
 {
     gpu_index = -1;
     network net = parse_network_cfg(cfgfile);
@@ -97,7 +97,7 @@ void partial(char *cfgfile, char *weightfile, char *outfile, int max)
     save_weights_upto(net, outfile, max);
 }
 
-void stacked(char *cfgfile, char *weightfile, char *outfile)
+static void stacked(char *cfgfile, char *weightfile, char *outfile)
 {
     gpu_index = -1;
     network net = parse_network_cfg(cfgfile);
@@ -109,7 +109,7 @@ void stacked(char *cfgfile, char *weightfile, char *outfile)
 }
 
 #include "convolutional_layer.h"
-void rescale_net(char *cfgfile, char *weightfile, char *outfile)
+static void rescale_net(char *cfgfile, char *weightfile, char *outfile)
 {
     gpu_index = -1;
     network net = parse_network_cfg(cfgfile);
@@ -127,7 +127,7 @@ void rescale_net(char *cfgfile, char *weightfile, char *outfile)
     save_weights(net, outfile);
 }
 
-void rgbgr_net(char *cfgfile, char *weightfile, char *outfile)
+static void rgbgr_net(char *cfgfile, char *weightfile, char *outfile)
 {
     gpu_index = -1;
     network net = parse_network_cfg(cfgfile);
@@ -145,7 +145,7 @@ void rgbgr_net(char *cfgfile, char *weightfile, char *outfile)
     save_weights(net, outfile);
 }
 
-void normalize_net(char *cfgfile, char *weightfile, char *outfile)
+static void normalize_net(char *cfgfile, char *weightfile, char *outfile)
 {
     gpu_index = -1;
     network net = parse_network_cfg(cfgfile);
@@ -168,7 +168,7 @@ void normalize_net(char *cfgfile, char *weightfile, char *outfile)
     save_weights(net, outfile);
 }
 
-void denormalize_net(char *cfgfile, char *weightfile, char *outfile)
+static void denormalize_net(char *cfgfile, char *weightfile, char *outfile)
 {
     gpu_index = -1;
     network net = parse_network_cfg(cfgfile);
@@ -186,7 +186,7 @@ void denormalize_net(char *cfgfile, char *weightfile, char *outfile)
     save_weights(net, outfile);
 }
 
-void visualize(char *cfgfile, char *weightfile)
+static void visualize(char *cfgfile, char *weightfile)
 {
     network net = parse_network_cfg(cfgfile);
     if(weightfile){
