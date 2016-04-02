@@ -10,13 +10,16 @@ OBJDIR=./obj/
 
 CC=gcc
 NVCC=nvcc
-OPTS=-Ofast
-LDFLAGS= -lm -pthread -lstdc++ 
-COMMON= 
-CFLAGS=-Wall -Wfatal-errors 
+OPTS=-march=native -std=gnu11 -Ofast
+LDFLAGS=-lm -pthread -lstdc++
+COMMON=
+CFLAGS=-Wall -Wfatal-errors -Wextra -Wno-unused-parameter
 
 ifeq ($(DEBUG), 1) 
-OPTS=-O0 -g
+OPTS+=-O0 -g
+else
+LDFLAGS+=-Wl,-x -Wl,-s
+CFLAGS+=-s
 endif
 
 CFLAGS+=$(OPTS)
