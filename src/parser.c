@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "parser.h"
 #include "activations.h"
@@ -938,64 +939,79 @@ void load_convolutional_weights(layer l, FILE *fp)
 
 void load_weights_upto(network *net, char *filename, int cutoff)
 {
-    fprintf(stderr, "Loading weights from %s...", filename);
-    fflush(stdout);
-    FILE *fp = fopen(filename, "rb");
-    if(!fp) file_error(filename);
+	fprintf(stderr, "Loading weights from %s...", filename);
+	fflush(stdout);
+	FILE *fp = fopen(filename, "rb");
+	if (!fp) {
+		file_error(filename);
+	}
 
-    int major;
-    int minor;
-    int revision;
-    fread(&major, sizeof(int), 1, fp);
-    fread(&minor, sizeof(int), 1, fp);
-    fread(&revision, sizeof(int), 1, fp);
-    fread(net->seen, sizeof(int), 1, fp);
-    int transpose = (major > 1000) || (minor > 1000);
+	int header[3]; // major, minor, revision
+	fread(header, sizeof(int), 3, fp);
+	fread(net->seen, sizeof(int), 1, fp);
+	bool transpose = (header[0] > 1000) || (header[1] > 1000);
 
-    int i;
-    for(i = 0; i < net->n && i < cutoff; ++i){
-        layer l = net->layers[i];
-        if (l.dontload) continue;
-        if(l.type == CONVOLUTIONAL){
-            load_convolutional_weights(l, fp);
-        }
-        if(l.type == DECONVOLUTIONAL){
-            int num = l.n*l.c*l.size*l.size;
-            fread(l.biases, sizeof(float), l.n, fp);
-            fread(l.filters, sizeof(float), num, fp);
+	if (net->n < cutoff) {
+		cutoff = net->n;
+	}
+
+	for (int i = 0; i < cutoff; ++i) {
+		layer l = net->layers[i];
+
+		if (l.dontload) {
+			continue;
+		}
+
+		int size;
+
+		switch (l.type) {
+		case CONVOLUTIONAL:
+			load_convolutional_weights(l, fp);
+			break;
+
+		case DECONVOLUTIONAL:
+			size = l.n * l.c * l.size * l.size;
+			fread(l.biases, sizeof(float), l.n, fp);
+			fread(l.filters, sizeof(float), size, fp);
 #ifdef GPU
-            if(gpu_index >= 0){
-                push_deconvolutional_layer(l);
-            }
+			if (gpu_index >= 0) {
+				push_deconvolutional_layer(l);
+			}
 #endif
-        }
-        if(l.type == CONNECTED){
-            load_connected_weights(l, fp, transpose);
-        }
-        if(l.type == CRNN){
-            load_convolutional_weights(*(l.input_layer), fp);
-            load_convolutional_weights(*(l.self_layer), fp);
-            load_convolutional_weights(*(l.output_layer), fp);
-        }
-        if(l.type == RNN){
-            load_connected_weights(*(l.input_layer), fp, transpose);
-            load_connected_weights(*(l.self_layer), fp, transpose);
-            load_connected_weights(*(l.output_layer), fp, transpose);
-        }
-        if(l.type == LOCAL){
-            int locations = l.out_w*l.out_h;
-            int size = l.size*l.size*l.c*l.n*locations;
-            fread(l.biases, sizeof(float), l.outputs, fp);
-            fread(l.filters, sizeof(float), size, fp);
+			break;
+
+		case CONNECTED:
+			load_connected_weights(l, fp, transpose);
+			break;
+
+		case CRNN:
+			load_convolutional_weights(*l.input_layer, fp);
+			load_convolutional_weights(*l.self_layer, fp);
+			load_convolutional_weights(*l.output_layer, fp);
+			break;
+
+		case RNN:
+			load_connected_weights(*l.input_layer, fp, transpose);
+			load_connected_weights(*l.self_layer, fp, transpose);
+			load_connected_weights(*l.output_layer, fp, transpose);
+			break;
+
+		case LOCAL:
+			size = l.n * l.c * l.size * l.size * l.out_w * l.out_h;
+			fread(l.biases, sizeof(float), l.outputs, fp);
+			fread(l.filters, sizeof(float), size, fp);
 #ifdef GPU
-            if(gpu_index >= 0){
-                push_local_layer(l);
-            }
+			if (gpu_index >= 0) {
+				push_local_layer(l);
+			}
 #endif
-        }
-    }
-    fprintf(stderr, "Done!\n");
-    fclose(fp);
+		default:
+			break;
+		}
+	}
+
+	fprintf(stderr, "Done!\n");
+	fclose(fp);
 }
 
 void load_weights(network *net, char *filename)
