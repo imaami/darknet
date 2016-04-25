@@ -410,16 +410,55 @@ route_layer parse_route(list *options, size_params params, network net)
     return layer;
 }
 
-learning_rate_policy get_policy(char *s)
+__attribute__((always_inline))
+static inline learning_rate_policy get_policy(char *s)
 {
-    if (strcmp(s, "poly")==0) return POLY;
-    if (strcmp(s, "constant")==0) return CONSTANT;
-    if (strcmp(s, "step")==0) return STEP;
-    if (strcmp(s, "exp")==0) return EXP;
-    if (strcmp(s, "sigmoid")==0) return SIG;
-    if (strcmp(s, "steps")==0) return STEPS;
-    fprintf(stderr, "Couldn't find policy %s, going with constant\n", s);
-    return CONSTANT;
+	switch (s[0]) {
+	case 'c':
+		if (strcmp(s + 1, "onstant") == 0) {
+			goto _default_to_constant;
+		}
+		break;
+
+	case 'e':
+		if (strcmp(s + 1, "xp") == 0) {
+			return EXP;
+		}
+		break;
+
+	case 'p':
+		if (strcmp(s + 1, "oly") == 0) {
+			return POLY;
+		}
+		break;
+
+	case 's':
+		switch (s[1]) {
+		case 'i':
+			if (strcmp(s + 2, "gmoid") == 0) {
+				return SIG;
+			}
+			break;
+
+		case 't':
+			if (s[2] == 'e' && s[3] == 'p') {
+				switch (s[4]) {
+				case '\0':
+					return STEP;
+
+				case 's':
+					if (s[5] == '\0') {
+						return STEPS;
+					}
+				}
+			}
+		}
+	}
+
+	fprintf(stderr, "Couldn't find policy %s, going with constant\n", s);
+
+_default_to_constant:
+	return CONSTANT;
 }
 
 void parse_net_options(list *options, network *net)
