@@ -25,11 +25,19 @@
 #include "list.h"
 #include "option_list.h"
 #include "utils.h"
+#include "cfg.h"
 
 typedef struct{
     char *type;
     list *options;
 }section;
+
+__attribute__((always_inline))
+static inline cfg_section_type_t
+get_section_type(section *s)
+{
+	return cfg_get_section_type(s->type);
+}
 
 int is_network(section *s);
 int is_convolutional(section *s);
