@@ -39,24 +39,12 @@ get_section_type(section *s)
 	return cfg_get_section_type(s->type);
 }
 
-int is_network(section *s);
-int is_convolutional(section *s);
-int is_activation(section *s);
-int is_local(section *s);
-int is_deconvolutional(section *s);
-int is_connected(section *s);
-int is_rnn(section *s);
-int is_crnn(section *s);
-int is_maxpool(section *s);
-int is_avgpool(section *s);
-int is_dropout(section *s);
-int is_softmax(section *s);
-int is_normalization(section *s);
-int is_crop(section *s);
-int is_shortcut(section *s);
-int is_cost(section *s);
-int is_detection(section *s);
-int is_route(section *s);
+__attribute__((always_inline))
+static inline bool is_network(section *s)
+{
+	return get_section_type(s) == CFG_SECTION_TYPE_NETWORK;
+}
+
 list *read_cfg(char *filename);
 
 void free_section(section *s)
@@ -558,49 +546,70 @@ network parse_network_cfg(char *filename)
         s = (section *)n->val;
         options = s->options;
         layer l = {0};
-        if(is_convolutional(s)){
-            l = parse_convolutional(options, params);
-        }else if(is_local(s)){
-            l = parse_local(options, params);
-        }else if(is_activation(s)){
-            l = parse_activation(options, params);
-        }else if(is_deconvolutional(s)){
-            l = parse_deconvolutional(options, params);
-        }else if(is_rnn(s)){
-            l = parse_rnn(options, params);
-        }else if(is_crnn(s)){
-            l = parse_crnn(options, params);
-        }else if(is_connected(s)){
-            l = parse_connected(options, params);
-        }else if(is_crop(s)){
-            l = parse_crop(options, params);
-        }else if(is_cost(s)){
-            l = parse_cost(options, params);
-        }else if(is_detection(s)){
-            l = parse_detection(options, params);
-        }else if(is_softmax(s)){
-            l = parse_softmax(options, params);
-        }else if(is_normalization(s)){
-            l = parse_normalization(options, params);
-        }else if(is_maxpool(s)){
-            l = parse_maxpool(options, params);
-        }else if(is_avgpool(s)){
-            l = parse_avgpool(options, params);
-        }else if(is_route(s)){
-            l = parse_route(options, params, net);
-        }else if(is_shortcut(s)){
-            l = parse_shortcut(options, params, net);
-        }else if(is_dropout(s)){
-            l = parse_dropout(options, params);
-            l.output = net.layers[count-1].output;
-            l.delta = net.layers[count-1].delta;
+
+	switch (get_section_type(s)) {
+	case CFG_SECTION_TYPE_CONVOLUTIONAL:
+		l = parse_convolutional(options, params);
+		break;
+	case CFG_SECTION_TYPE_DECONVOLUTIONAL:
+		l = parse_deconvolutional(options, params);
+		break;
+	case CFG_SECTION_TYPE_CONNECTED:
+		l = parse_connected(options, params);
+		break;
+	case CFG_SECTION_TYPE_MAXPOOL:
+		l = parse_maxpool(options, params);
+		break;
+	case CFG_SECTION_TYPE_SOFTMAX:
+		l = parse_softmax(options, params);
+		break;
+	case CFG_SECTION_TYPE_DETECTION:
+		l = parse_detection(options, params);
+		break;
+	case CFG_SECTION_TYPE_DROPOUT:
+		l = parse_dropout(options, params);
+		l.output = net.layers[count-1].output;
+		l.delta = net.layers[count-1].delta;
 #ifdef GPU
-            l.output_gpu = net.layers[count-1].output_gpu;
-            l.delta_gpu = net.layers[count-1].delta_gpu;
+		l.output_gpu = net.layers[count-1].output_gpu;
+		l.delta_gpu = net.layers[count-1].delta_gpu;
 #endif
-        }else{
-            fprintf(stderr, "Type not recognized: %s\n", s->type);
-        }
+		break;
+	case CFG_SECTION_TYPE_CROP:
+		l = parse_crop(options, params);
+		break;
+	case CFG_SECTION_TYPE_ROUTE:
+		l = parse_route(options, params, net);
+		break;
+	case CFG_SECTION_TYPE_COST:
+		l = parse_cost(options, params);
+		break;
+	case CFG_SECTION_TYPE_NORMALIZATION:
+		l = parse_normalization(options, params);
+		break;
+	case CFG_SECTION_TYPE_AVGPOOL:
+		l = parse_avgpool(options, params);
+		break;
+	case CFG_SECTION_TYPE_LOCAL:
+		l = parse_local(options, params);
+		break;
+	case CFG_SECTION_TYPE_SHORTCUT:
+		l = parse_shortcut(options, params, net);
+		break;
+	case CFG_SECTION_TYPE_ACTIVATION:
+		l = parse_activation(options, params);
+		break;
+	case CFG_SECTION_TYPE_RNN:
+		l = parse_rnn(options, params);
+		break;
+	case CFG_SECTION_TYPE_CRNN:
+		l = parse_crnn(options, params);
+		break;
+	default:
+		fprintf(stderr, "Type not recognized: %s\n", s->type);
+		break;
+	}
+
         l.dontload = option_find_int_quiet(options, "dontload", 0);
         l.dontloadscales = option_find_int_quiet(options, "dontloadscales", 0);
         option_unused(options);
@@ -619,89 +628,6 @@ network parse_network_cfg(char *filename)
     net.outputs = get_network_output_size(net);
     net.output = get_network_output(net);
     return net;
-}
-
-int is_shortcut(section *s)
-{
-    return (strcmp(s->type, "[shortcut]")==0);
-}
-int is_crop(section *s)
-{
-    return (strcmp(s->type, "[crop]")==0);
-}
-int is_cost(section *s)
-{
-    return (strcmp(s->type, "[cost]")==0);
-}
-int is_detection(section *s)
-{
-    return (strcmp(s->type, "[detection]")==0);
-}
-int is_local(section *s)
-{
-    return (strcmp(s->type, "[local]")==0);
-}
-int is_deconvolutional(section *s)
-{
-    return (strcmp(s->type, "[deconv]")==0
-            || strcmp(s->type, "[deconvolutional]")==0);
-}
-int is_convolutional(section *s)
-{
-    return (strcmp(s->type, "[conv]")==0
-            || strcmp(s->type, "[convolutional]")==0);
-}
-int is_activation(section *s)
-{
-    return (strcmp(s->type, "[activation]")==0);
-}
-int is_network(section *s)
-{
-    return (strcmp(s->type, "[net]")==0
-            || strcmp(s->type, "[network]")==0);
-}
-int is_crnn(section *s)
-{
-    return (strcmp(s->type, "[crnn]")==0);
-}
-int is_rnn(section *s)
-{
-    return (strcmp(s->type, "[rnn]")==0);
-}
-int is_connected(section *s)
-{
-    return (strcmp(s->type, "[conn]")==0
-            || strcmp(s->type, "[connected]")==0);
-}
-int is_maxpool(section *s)
-{
-    return (strcmp(s->type, "[max]")==0
-            || strcmp(s->type, "[maxpool]")==0);
-}
-int is_avgpool(section *s)
-{
-    return (strcmp(s->type, "[avg]")==0
-            || strcmp(s->type, "[avgpool]")==0);
-}
-int is_dropout(section *s)
-{
-    return (strcmp(s->type, "[dropout]")==0);
-}
-
-int is_normalization(section *s)
-{
-    return (strcmp(s->type, "[lrn]")==0
-            || strcmp(s->type, "[normalization]")==0);
-}
-
-int is_softmax(section *s)
-{
-    return (strcmp(s->type, "[soft]")==0
-            || strcmp(s->type, "[softmax]")==0);
-}
-int is_route(section *s)
-{
-    return (strcmp(s->type, "[route]")==0);
 }
 
 list *read_cfg(char *filename)
