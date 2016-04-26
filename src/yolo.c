@@ -314,7 +314,7 @@ void test_yolo(char *cfgfile, char *weightfile, char *filename, float thresh)
     if(weightfile){
         load_weights(&net, weightfile);
     }
-    detection_layer l = net.layers[net.n-1];
+    layer l = net.layers[net.n-1];
     set_batch_network(&net, 1);
     srand(2222222);
     clock_t time;
@@ -371,7 +371,7 @@ network net = parse_network_cfg(cfgfile);
 if(weightfile){
 load_weights(&net, weightfile);
 }
-detection_layer layer = net.layers[net.n-1];
+layer layer = net.layers[net.n-1];
 CvCapture *capture = cvCaptureFromCAM(-1);
 set_batch_network(&net, 1);
 srand(2222222);

@@ -29,10 +29,10 @@ char *get_cost_string(COST_TYPE a)
     return "sse";
 }
 
-cost_layer make_cost_layer(int batch, int inputs, COST_TYPE cost_type, float scale)
+layer make_cost_layer(int batch, int inputs, COST_TYPE cost_type, float scale)
 {
     fprintf(stderr, "Cost Layer: %d inputs\n", inputs);
-    cost_layer l = {0};
+    layer l = {0};
     l.type = COST;
 
     l.scale = scale;
@@ -50,7 +50,7 @@ cost_layer make_cost_layer(int batch, int inputs, COST_TYPE cost_type, float sca
     return l;
 }
 
-void resize_cost_layer(cost_layer *l, int inputs)
+void resize_cost_layer(layer *l, int inputs)
 {
     l->inputs = inputs;
     l->outputs = inputs;
@@ -64,7 +64,7 @@ void resize_cost_layer(cost_layer *l, int inputs)
 #endif
 }
 
-void forward_cost_layer(cost_layer l, network_state state)
+void forward_cost_layer(layer l, network_state state)
 {
     if (!state.truth) return;
     if(l.cost_type == MASKED){
@@ -81,24 +81,24 @@ void forward_cost_layer(cost_layer l, network_state state)
     l.cost[0] = sum_array(l.output, l.batch*l.inputs);
 }
 
-void backward_cost_layer(const cost_layer l, network_state state)
+void backward_cost_layer(const layer l, network_state state)
 {
     axpy_cpu(l.batch*l.inputs, l.scale, l.delta, 1, state.delta, 1);
 }
 
 #ifdef GPU
 
-void pull_cost_layer(cost_layer l)
+void pull_cost_layer(layer l)
 {
     cuda_pull_array(l.delta_gpu, l.delta, l.batch*l.inputs);
 }
 
-void push_cost_layer(cost_layer l)
+void push_cost_layer(layer l)
 {
     cuda_push_array(l.delta_gpu, l.delta, l.batch*l.inputs);
 }
 
-void forward_cost_layer_gpu(cost_layer l, network_state state)
+void forward_cost_layer_gpu(layer l, network_state state)
 {
     if (!state.truth) return;
     if (l.cost_type == MASKED) {
@@ -115,7 +115,7 @@ void forward_cost_layer_gpu(cost_layer l, network_state state)
     l.cost[0] = sum_array(l.output, l.batch*l.inputs);
 }
 
-void backward_cost_layer_gpu(const cost_layer l, network_state state)
+void backward_cost_layer_gpu(const layer l, network_state state)
 {
     axpy_ongpu(l.batch*l.inputs, l.scale, l.delta_gpu, 1, state.delta, 1);
 }

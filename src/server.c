@@ -73,14 +73,14 @@ void handle_connection(void *pointer)
     int i;
     for(i = 0; i < net.n; ++i){
         if(net.types[i] == CONVOLUTIONAL){
-            convolutional_layer layer = *(convolutional_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
 
             read_and_add_into(fd, layer.bias_updates, layer.n);
             int num = layer.n*layer.c*layer.size*layer.size;
             read_and_add_into(fd, layer.filter_updates, num);
         }
         if(net.types[i] == CONNECTED){
-            connected_layer layer = *(connected_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
 
             read_and_add_into(fd, layer.bias_updates, layer.outputs);
             read_and_add_into(fd, layer.weight_updates, layer.inputs*layer.outputs);
@@ -88,7 +88,7 @@ void handle_connection(void *pointer)
     }
     for(i = 0; i < net.n; ++i){
         if(net.types[i] == CONVOLUTIONAL){
-            convolutional_layer layer = *(convolutional_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
             update_convolutional_layer(layer);
 
             write_all(fd, (char*) layer.biases, layer.n*sizeof(float));
@@ -96,7 +96,7 @@ void handle_connection(void *pointer)
             write_all(fd, (char*) layer.filters, num*sizeof(float));
         }
         if(net.types[i] == CONNECTED){
-            connected_layer layer = *(connected_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
             update_connected_layer(layer);
             write_all(fd, (char *)layer.biases, layer.outputs*sizeof(float));
             write_all(fd, (char *)layer.weights, layer.outputs*layer.inputs*sizeof(float));
@@ -160,7 +160,7 @@ void client_update(network net, char *address)
     //printf("Sending\n");
     for(i = 0; i < net.n; ++i){
         if(net.types[i] == CONVOLUTIONAL){
-            convolutional_layer layer = *(convolutional_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
             write_all(fd, (char*) layer.bias_updates, layer.n*sizeof(float));
             int num = layer.n*layer.c*layer.size*layer.size;
             write_all(fd, (char*) layer.filter_updates, num*sizeof(float));
@@ -168,7 +168,7 @@ void client_update(network net, char *address)
             memset(layer.filter_updates, 0, num*sizeof(float));
         }
         if(net.types[i] == CONNECTED){
-            connected_layer layer = *(connected_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
             write_all(fd, (char *)layer.bias_updates, layer.outputs*sizeof(float));
             write_all(fd, (char *)layer.weight_updates, layer.outputs*layer.inputs*sizeof(float));
             memset(layer.bias_updates, 0, layer.outputs*sizeof(float));
@@ -179,7 +179,7 @@ void client_update(network net, char *address)
 
     for(i = 0; i < net.n; ++i){
         if(net.types[i] == CONVOLUTIONAL){
-            convolutional_layer layer = *(convolutional_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
 
             read_all(fd, (char*) layer.biases, layer.n*sizeof(float));
             int num = layer.n*layer.c*layer.size*layer.size;
@@ -190,7 +190,7 @@ void client_update(network net, char *address)
             #endif
         }
         if(net.types[i] == CONNECTED){
-            connected_layer layer = *(connected_layer *) net.layers[i];
+            layer layer = *(layer *) net.layers[i];
 
             read_all(fd, (char *)layer.biases, layer.outputs*sizeof(float));
             read_all(fd, (char *)layer.weights, layer.outputs*layer.inputs*sizeof(float));

@@ -470,7 +470,7 @@ int get_network_input_size(network net)
     return net.layers[0].inputs;
 }
 
-detection_layer get_network_detection_layer(network net)
+layer get_network_detection_layer(network net)
 {
     int i;
     for(i = 0; i < net.n; ++i){
@@ -479,7 +479,7 @@ detection_layer get_network_detection_layer(network net)
         }
     }
     fprintf(stderr, "Detection layer not found!!\n");
-    detection_layer l = {0};
+    layer l = {0};
     return l;
 }
 

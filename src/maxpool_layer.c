@@ -2,7 +2,7 @@
 #include "cuda.h"
 #include <stdio.h>
 
-image get_maxpool_image(maxpool_layer l)
+image get_maxpool_image(layer l)
 {
     int h = l.out_h;
     int w = l.out_w;
@@ -10,7 +10,7 @@ image get_maxpool_image(maxpool_layer l)
     return float_to_image(w,h,c,l.output);
 }
 
-image get_maxpool_delta(maxpool_layer l)
+image get_maxpool_delta(layer l)
 {
     int h = l.out_h;
     int w = l.out_w;
@@ -18,10 +18,10 @@ image get_maxpool_delta(maxpool_layer l)
     return float_to_image(w,h,c,l.delta);
 }
 
-maxpool_layer make_maxpool_layer(int batch, int h, int w, int c, int size, int stride)
+layer make_maxpool_layer(int batch, int h, int w, int c, int size, int stride)
 {
     fprintf(stderr, "Maxpool Layer: %d x %d x %d image, %d size, %d stride\n", h,w,c,size,stride);
-    maxpool_layer l = {0};
+    layer l = {0};
     l.type = MAXPOOL;
     l.batch = batch;
     l.h = h;
@@ -46,7 +46,7 @@ maxpool_layer make_maxpool_layer(int batch, int h, int w, int c, int size, int s
     return l;
 }
 
-void resize_maxpool_layer(maxpool_layer *l, int w, int h)
+void resize_maxpool_layer(layer *l, int w, int h)
 {
     int stride = l->stride;
     l->h = h;
@@ -72,7 +72,7 @@ void resize_maxpool_layer(maxpool_layer *l, int w, int h)
     #endif
 }
 
-void forward_maxpool_layer(const maxpool_layer l, network_state state)
+void forward_maxpool_layer(const layer l, network_state state)
 {
     int b,i,j,k,m,n;
     int w_offset = (-l.size-1)/2 + 1;
@@ -109,7 +109,7 @@ void forward_maxpool_layer(const maxpool_layer l, network_state state)
     }
 }
 
-void backward_maxpool_layer(const maxpool_layer l, network_state state)
+void backward_maxpool_layer(const layer l, network_state state)
 {
     int i;
     int h = (l.h-1)/l.stride + 1;

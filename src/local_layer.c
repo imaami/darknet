@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <time.h>
 
-int local_out_height(local_layer l)
+int local_out_height(layer l)
 {
     int h = l.h;
     if (!l.pad) h -= l.size;
@@ -15,7 +15,7 @@ int local_out_height(local_layer l)
     return h/l.stride + 1;
 }
 
-int local_out_width(local_layer l)
+int local_out_width(layer l)
 {
     int w = l.w;
     if (!l.pad) w -= l.size;
@@ -23,10 +23,10 @@ int local_out_width(local_layer l)
     return w/l.stride + 1;
 }
 
-local_layer make_local_layer(int batch, int h, int w, int c, int n, int size, int stride, int pad, ACTIVATION activation)
+layer make_local_layer(int batch, int h, int w, int c, int n, int size, int stride, int pad, ACTIVATION activation)
 {
     int i;
-    local_layer l = {0};
+    layer l = {0};
     l.type = LOCAL;
 
     l.h = h;
@@ -80,7 +80,7 @@ local_layer make_local_layer(int batch, int h, int w, int c, int n, int size, in
     return l;
 }
 
-void forward_local_layer(const local_layer l, network_state state)
+void forward_local_layer(const layer l, network_state state)
 {
     int out_h = local_out_height(l);
     int out_w = local_out_width(l);
@@ -111,7 +111,7 @@ void forward_local_layer(const local_layer l, network_state state)
     activate_array(l.output, l.outputs*l.batch, l.activation);
 }
 
-void backward_local_layer(local_layer l, network_state state)
+void backward_local_layer(layer l, network_state state)
 {
     int i, j;
     int locations = l.out_w*l.out_h;
@@ -156,7 +156,7 @@ void backward_local_layer(local_layer l, network_state state)
     }
 }
 
-void update_local_layer(local_layer l, int batch, float learning_rate, float momentum, float decay)
+void update_local_layer(layer l, int batch, float learning_rate, float momentum, float decay)
 {
     int locations = l.out_w*l.out_h;
     int size = l.size*l.size*l.c*l.n*locations;
@@ -170,7 +170,7 @@ void update_local_layer(local_layer l, int batch, float learning_rate, float mom
 
 #ifdef GPU
 
-void forward_local_layer_gpu(const local_layer l, network_state state)
+void forward_local_layer_gpu(const layer l, network_state state)
 {
     int out_h = local_out_height(l);
     int out_w = local_out_width(l);
@@ -201,7 +201,7 @@ void forward_local_layer_gpu(const local_layer l, network_state state)
     activate_array_ongpu(l.output_gpu, l.outputs*l.batch, l.activation);
 }
 
-void backward_local_layer_gpu(local_layer l, network_state state)
+void backward_local_layer_gpu(layer l, network_state state)
 {
     int i, j;
     int locations = l.out_w*l.out_h;
@@ -245,7 +245,7 @@ void backward_local_layer_gpu(local_layer l, network_state state)
     }
 }
 
-void update_local_layer_gpu(local_layer l, int batch, float learning_rate, float momentum, float decay)
+void update_local_layer_gpu(layer l, int batch, float learning_rate, float momentum, float decay)
 {
     int locations = l.out_w*l.out_h;
     int size = l.size*l.size*l.c*l.n*locations;
@@ -257,7 +257,7 @@ void update_local_layer_gpu(local_layer l, int batch, float learning_rate, float
     scal_ongpu(size, momentum, l.filter_updates_gpu, 1);
 }
 
-void pull_local_layer(local_layer l)
+void pull_local_layer(layer l)
 {
     int locations = l.out_w*l.out_h;
     int size = l.size*l.size*l.c*l.n*locations;
@@ -265,7 +265,7 @@ void pull_local_layer(local_layer l)
     cuda_pull_array(l.biases_gpu, l.biases, l.outputs);
 }
 
-void push_local_layer(local_layer l)
+void push_local_layer(layer l)
 {
     int locations = l.out_w*l.out_h;
     int size = l.size*l.size*l.c*l.n*locations;

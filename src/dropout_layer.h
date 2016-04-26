@@ -4,17 +4,15 @@
 #include "layer.h"
 #include "network.h"
 
-typedef layer dropout_layer;
+layer make_dropout_layer(int batch, int inputs, float probability);
 
-dropout_layer make_dropout_layer(int batch, int inputs, float probability);
-
-void forward_dropout_layer(dropout_layer l, network_state state);
-void backward_dropout_layer(dropout_layer l, network_state state);
-void resize_dropout_layer(dropout_layer *l, int inputs);
+void forward_dropout_layer(layer l, network_state state);
+void backward_dropout_layer(layer l, network_state state);
+void resize_dropout_layer(layer *l, int inputs);
 
 #ifdef GPU
-void forward_dropout_layer_gpu(dropout_layer l, network_state state);
-void backward_dropout_layer_gpu(dropout_layer l, network_state state);
+void forward_dropout_layer_gpu(layer l, network_state state);
+void backward_dropout_layer_gpu(layer l, network_state state);
 
 #endif
 #endif
