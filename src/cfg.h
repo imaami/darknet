@@ -37,14 +37,17 @@ cfg_get_section_type(char *s)
 	case 'a':
 		switch (s[2]) {
 		case 'c':
-			if (!strncmp(s + 3, "tive]", 5)) {
+			if (s[3] == 't' && s[4] == 'i' && s[5] == 'v' &&
+			    s[6] == 'e' && s[7] == ']') {
 				return CFG_SECTION_TYPE_ACTIVE;
 			}
 			break;
 
 		case 'v':
 			if (s[3] == 'g' &&
-			    (s[4] == ']' || !strncmp(s + 4, "pool]", 5))) {
+			    (s[4] == ']' || (s[4] == 'p' && s[5] == 'o' &&
+			                     s[6] == 'o' && s[7] == 'l' &&
+			                     s[8] == ']'))) {
 				return CFG_SECTION_TYPE_AVGPOOL;
 			}
 		}
@@ -58,7 +61,9 @@ cfg_get_section_type(char *s)
 				switch (s[4]) {
 				case 'n':
 					if (s[5] == ']' ||
-					    !strncmp(s + 5, "ected]", 6)) {
+					    (s[5] == 'e' && s[6] == 'c' &&
+					     s[7] == 't' && s[8] == 'e' &&
+					     s[9] == 'd' && s[10] == ']')) {
 						return CFG_SECTION_TYPE_CONNECTED;
 					}
 					break;
@@ -91,18 +96,27 @@ cfg_get_section_type(char *s)
 	case 'd':
 		switch (s[2]) {
 		case 'e':
-			if (!strncmp(s + 3, "conv", 4) &&
-			    (s[7] == ']' ||
-			     !strncmp(s + 7, "olutional]", 10))) {
-				return CFG_SECTION_TYPE_DECONVOLUTIONAL;
-			}
-			if (!strncmp(s + 3, "tection]", 8)) {
-				return CFG_SECTION_TYPE_DETECTION;
+			switch (s[3]) {
+			case 'c':
+				if (s[4] == 'o' && s[5] == 'n' && s[6] == 'v' &&
+				    (s[7] == ']' ||
+				     !strncmp(s + 7, "olutional]", 10))) {
+					return CFG_SECTION_TYPE_DECONVOLUTIONAL;
+				}
+				break;
+
+			case 't':
+				if (s[4] == 'e' && s[5] == 'c' && s[6] == 't' &&
+				    s[7] == 'i' && s[8] == 'o' && s[9] == 'n' &&
+				    s[10] == ']') {
+					return CFG_SECTION_TYPE_DETECTION;
+				}
 			}
 			break;
 
 		case 'r':
-			if (!strncmp(s + 3, "opout]", 6)) {
+			if (s[3] == 'o' && s[4] == 'p' && s[5] == 'o' &&
+			    s[6] == 'u' && s[7] == 't' && s[8] == ']') {
 				return CFG_SECTION_TYPE_DROPOUT;
 			}
 		}
@@ -111,7 +125,8 @@ cfg_get_section_type(char *s)
 	case 'l':
 		switch (s[2]) {
 		case 'o':
-			if (!strncmp(s + 3, "cal]", 4)) {
+			if (s[3] == 'c' && s[4] == 'a' && s[5] == 'l' &&
+			    s[6] == ']') {
 				return CFG_SECTION_TYPE_LOCAL;
 			}
 			break;
@@ -125,24 +140,64 @@ cfg_get_section_type(char *s)
 
 	case 'm':
 		if (s[2] == 'a' && s[3] == 'x' &&
-		    (s[4] == ']' || !strncmp(s + 4, "pool]", 5))) {
+		    (s[4] == ']' || (s[4] == 'p' && s[5] == 'o' &&
+		                     s[6] == 'o' && s[7] == 'l' &&
+		                     s[8] == ']'))) {
 			return CFG_SECTION_TYPE_MAXPOOL;
 		}
 		break;
 
 	case 'n':
-		// TODO: network, normalization
+		switch (s[2]) {
+		case 'e':
+			if (s[3] == 't' &&
+			    (s[4] == ']' || (s[4] == 'w' && s[5] == 'o' &&
+			                     s[6] == 'r' && s[7] == 'k' &&
+			                     s[8] == ']'))) {
+				return CFG_SECTION_TYPE_NETWORK;
+			}
+			break;
+
+		case 'o':
+			if (!strncmp(s + 3, "rmalization]", 12)) {
+				return CFG_SECTION_TYPE_NORMALIZATION;
+			}
+		}
 		break;
 
 	case 'r':
-		// TODO: rnn, route
+		switch (s[2]) {
+		case 'n':
+			if (s[3] == 'n' && s[4] == ']') {
+				return CFG_SECTION_TYPE_RNN;
+			}
+			break;
+
+		case 'o':
+			if (s[3] == 'u' && s[4] == 't' && s[5] == 'e' &&
+			    s[6] == ']') {
+				return CFG_SECTION_TYPE_ROUTE;
+			}
+		}
 		break;
 
 	case 's':
-		// TODO: shortcut, softmax
+		switch (s[2]) {
+		case 'h':
+			if (s[3] == 'o' && s[4] == 'r' && s[5] == 't' &&
+			    s[6] == 'c' && s[7] == 'u' && s[8] == 't' &&
+			    s[9] == ']') {
+				return CFG_SECTION_TYPE_SHORTCUT;
+			}
+			break;
 
-	default:
-		break;
+		case 'o':
+			if (s[3] == 'f' && s[4] == 't' &&
+			    (s[5] == ']' || (s[5] == 'm' && s[6] == 'a' &&
+			                     s[7] == 'x' && s[8] == ']'))) {
+				return CFG_SECTION_TYPE_SOFTMAX;
+			}
+		}
 	}
 
 	return CFG_SECTION_TYPE_NONE;
