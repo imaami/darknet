@@ -20,7 +20,7 @@ typedef enum {
 	CFG_SECTION_TYPE_AVGPOOL         = 0x0d,
 	CFG_SECTION_TYPE_LOCAL           = 0x0e,
 	CFG_SECTION_TYPE_SHORTCUT        = 0x0f,
-	CFG_SECTION_TYPE_ACTIVE          = 0x10,
+	CFG_SECTION_TYPE_ACTIVATION      = 0x10,
 	CFG_SECTION_TYPE_RNN             = 0x11,
 	CFG_SECTION_TYPE_CRNN            = 0x12
 } cfg_section_type_t;
@@ -38,8 +38,9 @@ cfg_get_section_type(char *s)
 		switch (s[2]) {
 		case 'c':
 			if (s[3] == 't' && s[4] == 'i' && s[5] == 'v' &&
-			    s[6] == 'e' && s[7] == ']') {
-				return CFG_SECTION_TYPE_ACTIVE;
+			    s[6] == 'a' && s[7] == 't' && s[8] == 'i' &&
+			    s[9] == 'o' && s[10] == 'n' && s[11] == ']') {
+				return CFG_SECTION_TYPE_ACTIVATION;
 			}
 			break;
 
