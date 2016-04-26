@@ -73,7 +73,6 @@ char *get_layer_string(LAYER_TYPE a);
 network make_network(int n);
 void forward_network(network net, network_state state);
 void backward_network(network net, network_state state);
-void update_network(network net);
 
 float train_network(network net, data d);
 float train_network_batch(network net, data d, int n);
@@ -100,7 +99,6 @@ void visualize_network(network net);
 int resize_network(network *net, int w, int h);
 void set_batch_network(network *net, int b);
 int get_network_input_size(network net);
-float get_network_cost(network net);
 
 int get_network_nuisance(network net);
 int get_network_background(network net);
