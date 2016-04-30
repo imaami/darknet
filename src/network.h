@@ -18,7 +18,7 @@ typedef struct network{
     int subdivisions;
     float momentum;
     float decay;
-    layer *layers;
+    layer_t *layers;
     int outputs;
     float *output;
     learning_rate_policy policy;

@@ -3,10 +3,10 @@
 #include "blas.h"
 #include <stdio.h>
 
-layer make_route_layer(int batch, int n, int *input_layers, int *input_sizes)
+layer_t make_route_layer(int batch, int n, int *input_layers, int *input_sizes)
 {
     fprintf(stderr,"Route Layer:");
-    layer l = {0};
+    layer_t l = {0};
     l.type = ROUTE;
     l.batch = batch;
     l.n = n;
@@ -30,7 +30,7 @@ layer make_route_layer(int batch, int n, int *input_layers, int *input_sizes)
     return l;
 }
 
-void forward_route_layer(const layer l, network net)
+void forward_route_layer(const layer_t l, network net)
 {
     int i, j;
     int offset = 0;
@@ -45,7 +45,7 @@ void forward_route_layer(const layer l, network net)
     }
 }
 
-void backward_route_layer(const layer l, network net)
+void backward_route_layer(const layer_t l, network net)
 {
     int i, j;
     int offset = 0;
@@ -61,7 +61,7 @@ void backward_route_layer(const layer l, network net)
 }
 
 #ifdef GPU
-void forward_route_layer_gpu(const layer l, network net)
+void forward_route_layer_gpu(const layer_t l, network net)
 {
     int i, j;
     int offset = 0;
@@ -76,7 +76,7 @@ void forward_route_layer_gpu(const layer l, network net)
     }
 }
 
-void backward_route_layer_gpu(const layer l, network net)
+void backward_route_layer_gpu(const layer_t l, network net)
 {
     int i, j;
     int offset = 0;

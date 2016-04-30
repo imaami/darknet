@@ -10,9 +10,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-layer make_detection_layer(int batch, int inputs, int n, int side, int classes, int coords, int rescore)
+layer_t make_detection_layer(int batch, int inputs, int n, int side, int classes, int coords, int rescore)
 {
-    layer l = {0};
+    layer_t l = {0};
     l.type = DETECTION;
 
     l.n = n;
@@ -39,7 +39,7 @@ layer make_detection_layer(int batch, int inputs, int n, int side, int classes, 
     return l;
 }
 
-void forward_detection_layer(const layer l, network_state state)
+void forward_detection_layer(const layer_t l, network_state state)
 {
     int locations = l.side*l.side;
     int i,j;
@@ -179,14 +179,14 @@ void forward_detection_layer(const layer l, network_state state)
     }
 }
 
-void backward_detection_layer(const layer l, network_state state)
+void backward_detection_layer(const layer_t l, network_state state)
 {
     axpy_cpu(l.batch*l.inputs, 1, l.delta, 1, state.delta, 1);
 }
 
 #ifdef GPU
 
-void forward_detection_layer_gpu(const layer l, network_state state)
+void forward_detection_layer_gpu(const layer_t l, network_state state)
 {
     if(!state.train){
         copy_ongpu(l.batch*l.inputs, state.input, 1, l.output_gpu, 1);
@@ -212,7 +212,7 @@ void forward_detection_layer_gpu(const layer l, network_state state)
     if(cpu_state.truth) free(cpu_state.truth);
 }
 
-void backward_detection_layer_gpu(layer l, network_state state)
+void backward_detection_layer_gpu(layer_t l, network_state state)
 {
     axpy_ongpu(l.batch*l.inputs, 1, l.delta_gpu, 1, state.delta, 1);
     //copy_ongpu(l.batch*l.inputs, l.delta_gpu, 1, state.delta, 1);

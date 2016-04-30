@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <time.h>
 
-void swap_binary(layer *l)
+void swap_binary(layer_t *l)
 {
     float *swap = l->filters;
     l->filters = l->binary_filters;
@@ -53,7 +53,7 @@ void binarize_filters(float *filters, int n, int size, float *binary)
     }
 }
 
-int convolutional_out_height(layer l)
+int convolutional_out_height(layer_t l)
 {
     int h = l.h;
     if (!l.pad) h -= l.size;
@@ -61,7 +61,7 @@ int convolutional_out_height(layer l)
     return h/l.stride + 1;
 }
 
-int convolutional_out_width(layer l)
+int convolutional_out_width(layer_t l)
 {
     int w = l.w;
     if (!l.pad) w -= l.size;
@@ -69,7 +69,7 @@ int convolutional_out_width(layer l)
     return w/l.stride + 1;
 }
 
-image get_convolutional_image(layer l)
+image get_convolutional_image(layer_t l)
 {
     int h,w,c;
     h = convolutional_out_height(l);
@@ -78,7 +78,7 @@ image get_convolutional_image(layer l)
     return float_to_image(w,h,c,l.output);
 }
 
-image get_convolutional_delta(layer l)
+image get_convolutional_delta(layer_t l)
 {
     int h,w,c;
     h = convolutional_out_height(l);
@@ -145,10 +145,10 @@ void normalize_delta_cpu(float *x, float *mean, float *variance, float *mean_del
     }
 }
 
-layer make_convolutional_layer(int batch, int h, int w, int c, int n, int size, int stride, int pad, ACTIVATION activation, int batch_normalize, int binary)
+layer_t make_convolutional_layer(int batch, int h, int w, int c, int n, int size, int stride, int pad, ACTIVATION activation, int batch_normalize, int binary)
 {
     int i;
-    layer l = {0};
+    layer_t l = {0};
     l.type = CONVOLUTIONAL;
 
     l.h = h;
@@ -242,7 +242,7 @@ layer make_convolutional_layer(int batch, int h, int w, int c, int n, int size, 
     return l;
 }
 
-void denormalize_convolutional_layer(layer l)
+void denormalize_convolutional_layer(layer_t l)
 {
     int i, j;
     for(i = 0; i < l.n; ++i){
@@ -256,7 +256,7 @@ void denormalize_convolutional_layer(layer l)
 
 void test_convolutional_layer()
 {
-    layer l = make_convolutional_layer(1, 5, 5, 3, 2, 5, 2, 1, LEAKY, 1, 0);
+    layer_t l = make_convolutional_layer(1, 5, 5, 3, 2, 5, 2, 1, LEAKY, 1, 0);
     l.batch_normalize = 1;
     float data[] = {1,1,1,1,1,
         1,1,1,1,1,
@@ -278,7 +278,7 @@ void test_convolutional_layer()
     forward_convolutional_layer(l, state);
 }
 
-void resize_convolutional_layer(layer *l, int w, int h)
+void resize_convolutional_layer(layer_t *l, int w, int h)
 {
     l->w = w;
     l->h = h;
@@ -343,7 +343,7 @@ void backward_bias(float *bias_updates, float *delta, int batch, int n, int size
     }
 }
 
-void forward_convolutional_layer(layer l, network_state state)
+void forward_convolutional_layer(layer_t l, network_state state)
 {
     int out_h = convolutional_out_height(l);
     int out_w = convolutional_out_width(l);
@@ -411,7 +411,7 @@ void forward_convolutional_layer(layer l, network_state state)
     activate_array(l.output, m*n*l.batch, l.activation);
 }
 
-void backward_convolutional_layer(layer l, network_state state)
+void backward_convolutional_layer(layer_t l, network_state state)
 {
     int i;
     int m = l.n;
@@ -445,7 +445,7 @@ void backward_convolutional_layer(layer l, network_state state)
     }
 }
 
-void update_convolutional_layer(layer l, int batch, float learning_rate, float momentum, float decay)
+void update_convolutional_layer(layer_t l, int batch, float learning_rate, float momentum, float decay)
 {
     int size = l.size*l.size*l.c*l.n;
     axpy_cpu(l.n, learning_rate/batch, l.bias_updates, 1, l.biases, 1);
@@ -457,7 +457,7 @@ void update_convolutional_layer(layer l, int batch, float learning_rate, float m
 }
 
 
-image get_convolutional_filter(layer l, int i)
+image get_convolutional_filter(layer_t l, int i)
 {
     int h = l.size;
     int w = l.size;
@@ -465,7 +465,7 @@ image get_convolutional_filter(layer l, int i)
     return float_to_image(w,h,c,l.filters+i*h*w*c);
 }
 
-void rgbgr_filters(layer l)
+void rgbgr_filters(layer_t l)
 {
     int i;
     for(i = 0; i < l.n; ++i){
@@ -476,7 +476,7 @@ void rgbgr_filters(layer l)
     }
 }
 
-void rescale_filters(layer l, float scale, float trans)
+void rescale_filters(layer_t l, float scale, float trans)
 {
     int i;
     for(i = 0; i < l.n; ++i){
@@ -489,7 +489,7 @@ void rescale_filters(layer l, float scale, float trans)
     }
 }
 
-image *get_filters(layer l)
+image *get_filters(layer_t l)
 {
     image *filters = calloc(l.n, sizeof(image));
     int i;
@@ -500,7 +500,7 @@ image *get_filters(layer l)
     return filters;
 }
 
-image *visualize_convolutional_layer(layer l, char *window, image *prev_filters)
+image *visualize_convolutional_layer(layer_t l, char *window, image *prev_filters)
 {
     image *single_filters = get_filters(l);
     show_images(single_filters, l.n, window);

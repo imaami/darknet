@@ -9,10 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-layer make_connected_layer(int batch, int inputs, int outputs, ACTIVATION activation, int batch_normalize)
+layer_t make_connected_layer(int batch, int inputs, int outputs, ACTIVATION activation, int batch_normalize)
 {
     int i;
-    layer l = {0};
+    layer_t l = {0};
     l.type = CONNECTED;
 
     l.inputs = inputs;
@@ -90,7 +90,7 @@ layer make_connected_layer(int batch, int inputs, int outputs, ACTIVATION activa
     return l;
 }
 
-void update_connected_layer(layer l, int batch, float learning_rate, float momentum, float decay)
+void update_connected_layer(layer_t l, int batch, float learning_rate, float momentum, float decay)
 {
     axpy_cpu(l.outputs, learning_rate/batch, l.bias_updates, 1, l.biases, 1);
     scal_cpu(l.outputs, momentum, l.bias_updates, 1);
@@ -105,7 +105,7 @@ void update_connected_layer(layer l, int batch, float learning_rate, float momen
     scal_cpu(l.inputs*l.outputs, momentum, l.weight_updates, 1);
 }
 
-void forward_connected_layer(layer l, network_state state)
+void forward_connected_layer(layer_t l, network_state state)
 {
     int i;
     fill_cpu(l.outputs*l.batch, 0, l.output, 1);
@@ -140,7 +140,7 @@ void forward_connected_layer(layer l, network_state state)
     activate_array(l.output, l.outputs*l.batch, l.activation);
 }
 
-void backward_connected_layer(layer l, network_state state)
+void backward_connected_layer(layer_t l, network_state state)
 {
     int i;
     gradient_array(l.output, l.outputs*l.batch, l.activation, l.delta);
@@ -178,7 +178,7 @@ void backward_connected_layer(layer l, network_state state)
 
 #ifdef GPU
 
-void pull_connected_layer(layer l)
+void pull_connected_layer(layer_t l)
 {
     cuda_pull_array(l.weights_gpu, l.weights, l.inputs*l.outputs);
     cuda_pull_array(l.biases_gpu, l.biases, l.outputs);
@@ -191,7 +191,7 @@ void pull_connected_layer(layer l)
     }
 }
 
-void push_connected_layer(layer l)
+void push_connected_layer(layer_t l)
 {
     cuda_push_array(l.weights_gpu, l.weights, l.inputs*l.outputs);
     cuda_push_array(l.biases_gpu, l.biases, l.outputs);
@@ -204,7 +204,7 @@ void push_connected_layer(layer l)
     }
 }
 
-void update_connected_layer_gpu(layer l, int batch, float learning_rate, float momentum, float decay)
+void update_connected_layer_gpu(layer_t l, int batch, float learning_rate, float momentum, float decay)
 {
     axpy_ongpu(l.outputs, learning_rate/batch, l.bias_updates_gpu, 1, l.biases_gpu, 1);
     scal_ongpu(l.outputs, momentum, l.bias_updates_gpu, 1);
@@ -219,7 +219,7 @@ void update_connected_layer_gpu(layer l, int batch, float learning_rate, float m
     scal_ongpu(l.inputs*l.outputs, momentum, l.weight_updates_gpu, 1);
 }
 
-void forward_connected_layer_gpu(layer l, network_state state)
+void forward_connected_layer_gpu(layer_t l, network_state state)
 {
     int i;
     fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
@@ -266,7 +266,7 @@ void forward_connected_layer_gpu(layer l, network_state state)
      */
 }
 
-void backward_connected_layer_gpu(layer l, network_state state)
+void backward_connected_layer_gpu(layer_t l, network_state state)
 {
     int i;
     gradient_array_ongpu(l.output_gpu, l.outputs*l.batch, l.activation, l.delta_gpu);

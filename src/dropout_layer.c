@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-layer make_dropout_layer(int batch, int inputs, float probability)
+layer_t make_dropout_layer(int batch, int inputs, float probability)
 {
     fprintf(stderr, "Dropout Layer: %d inputs, %f probability\n", inputs, probability);
-    layer l = {0};
+    layer_t l = {0};
     l.type = DROPOUT;
     l.probability = probability;
     l.inputs = inputs;
@@ -21,7 +21,7 @@ layer make_dropout_layer(int batch, int inputs, float probability)
     return l;
 } 
 
-void resize_dropout_layer(layer *l, int inputs)
+void resize_dropout_layer(layer_t *l, int inputs)
 {
     l->rand = realloc(l->rand, l->inputs*l->batch*sizeof(float));
     #ifdef GPU
@@ -31,7 +31,7 @@ void resize_dropout_layer(layer *l, int inputs)
     #endif
 }
 
-void forward_dropout_layer(layer l, network_state state)
+void forward_dropout_layer(layer_t l, network_state state)
 {
     int i;
     if (!state.train) return;
@@ -43,7 +43,7 @@ void forward_dropout_layer(layer l, network_state state)
     }
 }
 
-void backward_dropout_layer(layer l, network_state state)
+void backward_dropout_layer(layer_t l, network_state state)
 {
     int i;
     if(!state.delta) return;

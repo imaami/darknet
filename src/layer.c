@@ -2,7 +2,7 @@
 #include "cuda.h"
 #include <stdlib.h>
 
-void free_layer(layer l)
+void free_layer(layer_t l)
 {
     if(l.type == DROPOUT){
         if(l.rand)           free(l.rand);

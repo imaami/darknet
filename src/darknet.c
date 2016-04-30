@@ -57,8 +57,8 @@ static void average(int argc, char *argv[])
         weightfile = argv[i+5];   
         load_weights(&net, weightfile);
         for(j = 0; j < net.n; ++j){
-            layer l = net.layers[j];
-            layer out = sum.layers[j];
+            layer_t l = net.layers[j];
+            layer_t out = sum.layers[j];
             if(l.type == CONVOLUTIONAL){
                 int num = l.n*l.c*l.size*l.size;
                 axpy_cpu(l.n, 1, l.biases, 1, out.biases, 1);
@@ -72,7 +72,7 @@ static void average(int argc, char *argv[])
     }
     n = n+1;
     for(j = 0; j < net.n; ++j){
-        layer l = sum.layers[j];
+        layer_t l = sum.layers[j];
         if(l.type == CONVOLUTIONAL){
             int num = l.n*l.c*l.size*l.size;
             scal_cpu(l.n, 1./n, l.biases, 1);
@@ -118,7 +118,7 @@ static void rescale_net(char *cfgfile, char *weightfile, char *outfile)
     }
     int i;
     for(i = 0; i < net.n; ++i){
-        layer l = net.layers[i];
+        layer_t l = net.layers[i];
         if(l.type == CONVOLUTIONAL){
             rescale_filters(l, 2, -.5);
             break;
@@ -136,7 +136,7 @@ static void rgbgr_net(char *cfgfile, char *weightfile, char *outfile)
     }
     int i;
     for(i = 0; i < net.n; ++i){
-        layer l = net.layers[i];
+        layer_t l = net.layers[i];
         if(l.type == CONVOLUTIONAL){
             rgbgr_filters(l);
             break;
@@ -154,7 +154,7 @@ static void normalize_net(char *cfgfile, char *weightfile, char *outfile)
     }
     int i, j;
     for(i = 0; i < net.n; ++i){
-        layer l = net.layers[i];
+        layer_t l = net.layers[i];
         if(l.type == CONVOLUTIONAL){
             net.layers[i].batch_normalize=1;
             net.layers[i].scales = calloc(l.n, sizeof(float));
@@ -177,7 +177,7 @@ static void denormalize_net(char *cfgfile, char *weightfile, char *outfile)
     }
     int i;
     for (i = 0; i < net.n; ++i) {
-        layer l = net.layers[i];
+        layer_t l = net.layers[i];
         if (l.type == CONVOLUTIONAL && l.batch_normalize) {
             denormalize_convolutional_layer(l);
             net.layers[i].batch_normalize=0;

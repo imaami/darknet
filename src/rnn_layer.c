@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void increment_layer(layer *l, int steps)
+static void increment_layer(layer_t *l, int steps)
 {
     int num = l->outputs*l->batch*steps;
     l->output += num;
@@ -26,11 +26,11 @@ static void increment_layer(layer *l, int steps)
 #endif
 }
 
-layer make_rnn_layer(int batch, int inputs, int hidden, int outputs, int steps, ACTIVATION activation, int batch_normalize, int log)
+layer_t make_rnn_layer(int batch, int inputs, int hidden, int outputs, int steps, ACTIVATION activation, int batch_normalize, int log)
 {
     fprintf(stderr, "RNN Layer: %d inputs, %d outputs\n", inputs, outputs);
     batch = batch / steps;
-    layer l = {0};
+    layer_t l = {0};
     l.batch = batch;
     l.type = RNN;
     l.steps = steps;
@@ -39,17 +39,17 @@ layer make_rnn_layer(int batch, int inputs, int hidden, int outputs, int steps, 
 
     l.state = calloc(batch*hidden*(steps+1), sizeof(float));
 
-    l.input_layer = malloc(sizeof(layer));
+    l.input_layer = malloc(sizeof(layer_t));
     fprintf(stderr, "\t\t");
     *(l.input_layer) = make_connected_layer(batch*steps, inputs, hidden, activation, batch_normalize);
     l.input_layer->batch = batch;
 
-    l.self_layer = malloc(sizeof(layer));
+    l.self_layer = malloc(sizeof(layer_t));
     fprintf(stderr, "\t\t");
     *(l.self_layer) = make_connected_layer(batch*steps, hidden, hidden, (log==2)?LOGGY:(log==1?LOGISTIC:activation), batch_normalize);
     l.self_layer->batch = batch;
 
-    l.output_layer = malloc(sizeof(layer));
+    l.output_layer = malloc(sizeof(layer_t));
     fprintf(stderr, "\t\t");
     *(l.output_layer) = make_connected_layer(batch*steps, hidden, outputs, activation, batch_normalize);
     l.output_layer->batch = batch;
@@ -67,21 +67,21 @@ layer make_rnn_layer(int batch, int inputs, int hidden, int outputs, int steps, 
     return l;
 }
 
-void update_rnn_layer(layer l, int batch, float learning_rate, float momentum, float decay)
+void update_rnn_layer(layer_t l, int batch, float learning_rate, float momentum, float decay)
 {
     update_connected_layer(*(l.input_layer), batch, learning_rate, momentum, decay);
     update_connected_layer(*(l.self_layer), batch, learning_rate, momentum, decay);
     update_connected_layer(*(l.output_layer), batch, learning_rate, momentum, decay);
 }
 
-void forward_rnn_layer(layer l, network_state state)
+void forward_rnn_layer(layer_t l, network_state state)
 {
     network_state s = {0};
     s.train = state.train;
     int i;
-    layer input_layer = *(l.input_layer);
-    layer self_layer = *(l.self_layer);
-    layer output_layer = *(l.output_layer);
+    layer_t input_layer = *(l.input_layer);
+    layer_t self_layer = *(l.self_layer);
+    layer_t output_layer = *(l.output_layer);
 
     fill_cpu(l.outputs * l.batch * l.steps, 0, output_layer.delta, 1);
     fill_cpu(l.hidden * l.batch * l.steps, 0, self_layer.delta, 1);
@@ -115,14 +115,14 @@ void forward_rnn_layer(layer l, network_state state)
     }
 }
 
-void backward_rnn_layer(layer l, network_state state)
+void backward_rnn_layer(layer_t l, network_state state)
 {
     network_state s = {0};
     s.train = state.train;
     int i;
-    layer input_layer = *(l.input_layer);
-    layer self_layer = *(l.self_layer);
-    layer output_layer = *(l.output_layer);
+    layer_t input_layer = *(l.input_layer);
+    layer_t self_layer = *(l.self_layer);
+    layer_t output_layer = *(l.output_layer);
 
     increment_layer(&input_layer, l.steps-1);
     increment_layer(&self_layer, l.steps-1);
@@ -167,35 +167,35 @@ void backward_rnn_layer(layer l, network_state state)
 
 #ifdef GPU
 
-void pull_rnn_layer(layer l)
+void pull_rnn_layer(layer_t l)
 {
     pull_connected_layer(*(l.input_layer));
     pull_connected_layer(*(l.self_layer));
     pull_connected_layer(*(l.output_layer));
 }
 
-void push_rnn_layer(layer l)
+void push_rnn_layer(layer_t l)
 {
     push_connected_layer(*(l.input_layer));
     push_connected_layer(*(l.self_layer));
     push_connected_layer(*(l.output_layer));
 }
 
-void update_rnn_layer_gpu(layer l, int batch, float learning_rate, float momentum, float decay)
+void update_rnn_layer_gpu(layer_t l, int batch, float learning_rate, float momentum, float decay)
 {
     update_connected_layer_gpu(*(l.input_layer), batch, learning_rate, momentum, decay);
     update_connected_layer_gpu(*(l.self_layer), batch, learning_rate, momentum, decay);
     update_connected_layer_gpu(*(l.output_layer), batch, learning_rate, momentum, decay);
 }
 
-void forward_rnn_layer_gpu(layer l, network_state state)
+void forward_rnn_layer_gpu(layer_t l, network_state state)
 {
     network_state s = {0};
     s.train = state.train;
     int i;
-    layer input_layer = *(l.input_layer);
-    layer self_layer = *(l.self_layer);
-    layer output_layer = *(l.output_layer);
+    layer_t input_layer = *(l.input_layer);
+    layer_t self_layer = *(l.self_layer);
+    layer_t output_layer = *(l.output_layer);
 
     fill_ongpu(l.outputs * l.batch * l.steps, 0, output_layer.delta_gpu, 1);
     fill_ongpu(l.hidden * l.batch * l.steps, 0, self_layer.delta_gpu, 1);
@@ -229,14 +229,14 @@ void forward_rnn_layer_gpu(layer l, network_state state)
     }
 }
 
-void backward_rnn_layer_gpu(layer l, network_state state)
+void backward_rnn_layer_gpu(layer_t l, network_state state)
 {
     network_state s = {0};
     s.train = state.train;
     int i;
-    layer input_layer = *(l.input_layer);
-    layer self_layer = *(l.self_layer);
-    layer output_layer = *(l.output_layer);
+    layer_t input_layer = *(l.input_layer);
+    layer_t self_layer = *(l.self_layer);
+    layer_t output_layer = *(l.output_layer);
     increment_layer(&input_layer,  l.steps - 1);
     increment_layer(&self_layer,   l.steps - 1);
     increment_layer(&output_layer, l.steps - 1);

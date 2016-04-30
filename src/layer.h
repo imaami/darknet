@@ -4,7 +4,7 @@
 #include "activations.h"
 
 struct layer;
-typedef struct layer layer;
+typedef struct layer layer_t;
 
 typedef enum {
     CONVOLUTIONAL,
@@ -30,7 +30,7 @@ typedef enum{
     SSE, MASKED, SMOOTH
 } COST_TYPE;
 
-struct layer{
+struct layer {
     LAYER_TYPE type;
     ACTIVATION activation;
     COST_TYPE cost_type;
@@ -177,6 +177,6 @@ struct layer{
     #endif
 };
 
-void free_layer(layer);
+void free_layer(layer_t);
 
 #endif

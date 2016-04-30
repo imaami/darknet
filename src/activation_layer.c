@@ -9,9 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-layer make_activation_layer(int batch, int inputs, ACTIVATION activation)
+layer_t make_activation_layer(int batch, int inputs, ACTIVATION activation)
 {
-    layer l = {0};
+    layer_t l = {0};
     l.type = ACTIVE;
 
     l.inputs = inputs;
@@ -30,13 +30,13 @@ layer make_activation_layer(int batch, int inputs, ACTIVATION activation)
     return l;
 }
 
-void forward_activation_layer(layer l, network_state state)
+void forward_activation_layer(layer_t l, network_state state)
 {
     copy_cpu(l.outputs*l.batch, state.input, 1, l.output, 1);
     activate_array(l.output, l.outputs*l.batch, l.activation);
 }
 
-void backward_activation_layer(layer l, network_state state)
+void backward_activation_layer(layer_t l, network_state state)
 {
     gradient_array(l.output, l.outputs*l.batch, l.activation, l.delta);
     copy_cpu(l.outputs*l.batch, l.delta, 1, state.delta, 1);
@@ -44,13 +44,13 @@ void backward_activation_layer(layer l, network_state state)
 
 #ifdef GPU
 
-void forward_activation_layer_gpu(layer l, network_state state)
+void forward_activation_layer_gpu(layer_t l, network_state state)
 {
     copy_ongpu(l.outputs*l.batch, state.input, 1, l.output_gpu, 1);
     activate_array_ongpu(l.output_gpu, l.outputs*l.batch, l.activation);
 }
 
-void backward_activation_layer_gpu(layer l, network_state state)
+void backward_activation_layer_gpu(layer_t l, network_state state)
 {
     gradient_array_ongpu(l.output_gpu, l.outputs*l.batch, l.activation, l.delta_gpu);
     copy_ongpu(l.outputs*l.batch, l.delta_gpu, 1, state.delta, 1);

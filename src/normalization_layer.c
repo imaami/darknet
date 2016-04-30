@@ -2,10 +2,10 @@
 #include "blas.h"
 #include <stdio.h>
 
-layer make_normalization_layer(int batch, int w, int h, int c, int size, float alpha, float beta, float kappa)
+layer_t make_normalization_layer(int batch, int w, int h, int c, int size, float alpha, float beta, float kappa)
 {
     fprintf(stderr, "Local Response Normalization Layer: %d x %d x %d image, %d size\n", w,h,c,size);
-    layer layer = {0};
+    layer_t layer = {0};
     layer.type = NORMALIZATION;
     layer.batch = batch;
     layer.h = layer.out_h = h;
@@ -30,7 +30,7 @@ layer make_normalization_layer(int batch, int w, int h, int c, int size, float a
     return layer;
 }
 
-void resize_normalization_layer(layer *layer, int w, int h)
+void resize_normalization_layer(layer_t *layer, int w, int h)
 {
     int c = layer->c;
     int batch = layer->batch;
@@ -56,7 +56,7 @@ void resize_normalization_layer(layer *layer, int w, int h)
 #endif
 }
 
-void forward_normalization_layer(const layer layer, network_state state)
+void forward_normalization_layer(const layer_t layer, network_state state)
 {
     int k,b;
     int w = layer.w;
@@ -87,7 +87,7 @@ void forward_normalization_layer(const layer layer, network_state state)
     mul_cpu(w*h*c*layer.batch, state.input, 1, layer.output, 1);
 }
 
-void backward_normalization_layer(const layer layer, network_state state)
+void backward_normalization_layer(const layer_t layer, network_state state)
 {
     // TODO This is approximate ;-)
     // Also this should add in to delta instead of overwritting.
@@ -100,7 +100,7 @@ void backward_normalization_layer(const layer layer, network_state state)
 }
 
 #ifdef GPU
-void forward_normalization_layer_gpu(const layer layer, network_state state)
+void forward_normalization_layer_gpu(const layer_t layer, network_state state)
 {
     int k,b;
     int w = layer.w;
@@ -131,7 +131,7 @@ void forward_normalization_layer_gpu(const layer layer, network_state state)
     mul_ongpu(w*h*c*layer.batch, state.input, 1, layer.output_gpu, 1);
 }
 
-void backward_normalization_layer_gpu(const layer layer, network_state state)
+void backward_normalization_layer_gpu(const layer_t layer, network_state state)
 {
     // TODO This is approximate ;-)
 

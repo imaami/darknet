@@ -6,15 +6,15 @@
 #include "layer.h"
 #include "network.h"
 
-image get_avgpool_image(layer l);
-layer make_avgpool_layer(int batch, int w, int h, int c);
-void resize_avgpool_layer(layer *l, int w, int h);
-void forward_avgpool_layer(const layer l, network_state state);
-void backward_avgpool_layer(const layer l, network_state state);
+image get_avgpool_image(layer_t l);
+layer_t make_avgpool_layer(int batch, int w, int h, int c);
+void resize_avgpool_layer(layer_t *l, int w, int h);
+void forward_avgpool_layer(const layer_t l, network_state state);
+void backward_avgpool_layer(const layer_t l, network_state state);
 
 #ifdef GPU
-void forward_avgpool_layer_gpu(layer l, network_state state);
-void backward_avgpool_layer_gpu(layer l, network_state state);
+void forward_avgpool_layer_gpu(layer_t l, network_state state);
+void backward_avgpool_layer_gpu(layer_t l, network_state state);
 #endif
 
 #endif

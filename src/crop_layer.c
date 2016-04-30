@@ -2,7 +2,7 @@
 #include "cuda.h"
 #include <stdio.h>
 
-image get_crop_image(layer l)
+image get_crop_image(layer_t l)
 {
     int h = l.out_h;
     int w = l.out_w;
@@ -10,10 +10,10 @@ image get_crop_image(layer l)
     return float_to_image(w,h,c,l.output);
 }
 
-layer make_crop_layer(int batch, int h, int w, int c, int crop_height, int crop_width, int flip, float angle, float saturation, float exposure)
+layer_t make_crop_layer(int batch, int h, int w, int c, int crop_height, int crop_width, int flip, float angle, float saturation, float exposure)
 {
     fprintf(stderr, "Crop Layer: %d x %d -> %d x %d x %d image\n", h,w,crop_height,crop_width,c);
-    layer l = {0};
+    layer_t l = {0};
     l.type = CROP;
     l.batch = batch;
     l.h = h;
@@ -37,7 +37,7 @@ layer make_crop_layer(int batch, int h, int w, int c, int crop_height, int crop_
     return l;
 }
 
-void resize_crop_layer(layer *l, int w, int h)
+void resize_crop_layer(layer_t *l, int w, int h)
 {
     l->w = w;
     l->h = h;
@@ -56,7 +56,7 @@ void resize_crop_layer(layer *l, int w, int h)
 }
 
 
-void forward_crop_layer(const layer l, network_state state)
+void forward_crop_layer(const layer_t l, network_state state)
 {
     int i,j,c,b,row,col;
     int index;

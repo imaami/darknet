@@ -2,10 +2,10 @@
 #include "cuda.h"
 #include <stdio.h>
 
-layer make_avgpool_layer(int batch, int w, int h, int c)
+layer_t make_avgpool_layer(int batch, int w, int h, int c)
 {
     fprintf(stderr, "Avgpool Layer: %d x %d x %d image\n", w,h,c);
-    layer l = {0};
+    layer_t l = {0};
     l.type = AVGPOOL;
     l.batch = batch;
     l.h = h;
@@ -26,14 +26,14 @@ layer make_avgpool_layer(int batch, int w, int h, int c)
     return l;
 }
 
-void resize_avgpool_layer(layer *l, int w, int h)
+void resize_avgpool_layer(layer_t *l, int w, int h)
 {
     l->w = w;
     l->h = h;
     l->inputs = h*w*l->c;
 }
 
-void forward_avgpool_layer(const layer l, network_state state)
+void forward_avgpool_layer(const layer_t l, network_state state)
 {
     int b,i,k;
 
@@ -50,7 +50,7 @@ void forward_avgpool_layer(const layer l, network_state state)
     }
 }
 
-void backward_avgpool_layer(const layer l, network_state state)
+void backward_avgpool_layer(const layer_t l, network_state state)
 {
     int b,i,k;
 

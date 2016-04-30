@@ -31,7 +31,7 @@ void train_yolo(char *cfgfile, char *weightfile)
     data train, buffer;
 
 
-    layer l = net.layers[net.n - 1];
+    layer_t l = net.layers[net.n - 1];
 
     int side = l.side;
     int classes = l.classes;
@@ -147,7 +147,7 @@ void validate_yolo(char *cfgfile, char *weightfile)
     //list *plist = get_paths("data/voc.2012.test");
     char **paths = (char **)list_to_array(plist);
 
-    layer l = net.layers[net.n-1];
+    layer_t l = net.layers[net.n-1];
     int classes = l.classes;
     int square = l.sqrt;
     int side = l.side;
@@ -235,7 +235,7 @@ void validate_yolo_recall(char *cfgfile, char *weightfile)
     list *plist = get_paths("data/voc.2007.test");
     char **paths = (char **)list_to_array(plist);
 
-    layer l = net.layers[net.n-1];
+    layer_t l = net.layers[net.n-1];
     int classes = l.classes;
     int square = l.sqrt;
     int side = l.side;
@@ -314,7 +314,7 @@ void test_yolo(char *cfgfile, char *weightfile, char *filename, float thresh)
     if(weightfile){
         load_weights(&net, weightfile);
     }
-    layer l = net.layers[net.n-1];
+    layer_t l = net.layers[net.n-1];
     set_batch_network(&net, 1);
     srand(2222222);
     clock_t time;
@@ -371,7 +371,7 @@ network net = parse_network_cfg(cfgfile);
 if(weightfile){
 load_weights(&net, weightfile);
 }
-layer layer = net.layers[net.n-1];
+layer_t layer = net.layers[net.n-1];
 CvCapture *capture = cvCaptureFromCAM(-1);
 set_batch_network(&net, 1);
 srand(2222222);

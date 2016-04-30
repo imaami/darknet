@@ -27,7 +27,7 @@ void train_swag(char *cfgfile, char *weightfile)
     int i = *net.seen/imgs;
     data train, buffer;
 
-    layer l = net.layers[net.n - 1];
+    layer_t l = net.layers[net.n - 1];
 
     int side = l.side;
     int classes = l.classes;

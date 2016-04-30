@@ -8,24 +8,24 @@
 #include <stdio.h>
 #include <time.h>
 
-int deconvolutional_out_height(layer l)
+int deconvolutional_out_height(layer_t l)
 {
     int h = l.stride*(l.h - 1) + l.size;
     return h;
 }
 
-int deconvolutional_out_width(layer l)
+int deconvolutional_out_width(layer_t l)
 {
     int w = l.stride*(l.w - 1) + l.size;
     return w;
 }
 
-int deconvolutional_out_size(layer l)
+int deconvolutional_out_size(layer_t l)
 {
     return deconvolutional_out_height(l) * deconvolutional_out_width(l);
 }
 
-image get_deconvolutional_image(layer l)
+image get_deconvolutional_image(layer_t l)
 {
     int h,w,c;
     h = deconvolutional_out_height(l);
@@ -34,7 +34,7 @@ image get_deconvolutional_image(layer l)
     return float_to_image(w,h,c,l.output);
 }
 
-image get_deconvolutional_delta(layer l)
+image get_deconvolutional_delta(layer_t l)
 {
     int h,w,c;
     h = deconvolutional_out_height(l);
@@ -43,10 +43,10 @@ image get_deconvolutional_delta(layer l)
     return float_to_image(w,h,c,l.delta);
 }
 
-layer make_deconvolutional_layer(int batch, int h, int w, int c, int n, int size, int stride, ACTIVATION activation)
+layer_t make_deconvolutional_layer(int batch, int h, int w, int c, int n, int size, int stride, ACTIVATION activation)
 {
     int i;
-    layer l = {0};
+    layer_t l = {0};
     l.type = DECONVOLUTIONAL;
 
     l.h = h;
@@ -99,7 +99,7 @@ layer make_deconvolutional_layer(int batch, int h, int w, int c, int n, int size
     return l;
 }
 
-void resize_deconvolutional_layer(layer *l, int h, int w)
+void resize_deconvolutional_layer(layer_t *l, int h, int w)
 {
     l->h = h;
     l->w = w;
@@ -123,7 +123,7 @@ void resize_deconvolutional_layer(layer *l, int h, int w)
     #endif
 }
 
-void forward_deconvolutional_layer(const layer l, network_state state)
+void forward_deconvolutional_layer(const layer_t l, network_state state)
 {
     int i;
     int out_h = deconvolutional_out_height(l);
@@ -149,7 +149,7 @@ void forward_deconvolutional_layer(const layer l, network_state state)
     activate_array(l.output, l.batch*l.n*size, l.activation);
 }
 
-void backward_deconvolutional_layer(layer l, network_state state)
+void backward_deconvolutional_layer(layer_t l, network_state state)
 {
     float alpha = 1./l.batch;
     int out_h = deconvolutional_out_height(l);
@@ -187,7 +187,7 @@ void backward_deconvolutional_layer(layer l, network_state state)
     }
 }
 
-void update_deconvolutional_layer(layer l, float learning_rate, float momentum, float decay)
+void update_deconvolutional_layer(layer_t l, float learning_rate, float momentum, float decay)
 {
     int size = l.size*l.size*l.c*l.n;
     axpy_cpu(l.n, learning_rate, l.bias_updates, 1, l.biases, 1);

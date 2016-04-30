@@ -118,7 +118,7 @@ network make_network(int n)
 {
     network net = {0};
     net.n = n;
-    net.layers = calloc(net.n, sizeof(layer));
+    net.layers = calloc(net.n, sizeof(layer_t));
     net.seen = calloc(1, sizeof(int));
     #ifdef GPU
     net.input_gpu = calloc(1, sizeof(float *));
@@ -131,7 +131,7 @@ void forward_network(network net, network_state state)
 {
 	for (int i = 0; i < net.n; ++i) {
 		state.index = i;
-		layer l = net.layers[i];
+		layer_t l = net.layers[i];
 		if (l.delta) {
 			scal_cpu(l.outputs * l.batch, 0, l.delta, 1);
 		}
@@ -198,7 +198,7 @@ static void update_network(network net)
 	int update_batch = net.batch * net.subdivisions;
 	float rate = get_current_rate(net);
 	for (int i = 0; i < net.n; ++i) {
-		layer l = net.layers[i];
+		layer_t l = net.layers[i];
 		switch (l.type) {
 		case CONVOLUTIONAL:
 			update_convolutional_layer(l, update_batch, rate, net.momentum, net.decay);
@@ -264,11 +264,11 @@ void backward_network(network net, network_state state)
 			state.input = original_input;
 			state.delta = original_delta;
 		} else {
-			layer prev = net.layers[i-1];
+			layer_t prev = net.layers[i-1];
 			state.input = prev.output;
 			state.delta = prev.delta;
 		}
-		layer l = net.layers[i];
+		layer_t l = net.layers[i];
 		switch (l.type) {
 		case CONVOLUTIONAL:
 			backward_convolutional_layer(l, state);
@@ -422,7 +422,7 @@ int resize_network(network *net, int w, int h)
 	//fprintf(stderr, "Resizing to %d x %d...", w, h);
 	//fflush(stderr);
 	for (int i = 0; i < net->n; ++i) {
-		layer l = net->layers[i];
+		layer_t l = net->layers[i];
 		switch (l.type) {
 		case CONVOLUTIONAL:
 			resize_convolutional_layer(&l, w, h);
@@ -470,7 +470,7 @@ int get_network_input_size(network net)
     return net.layers[0].inputs;
 }
 
-layer get_network_detection_layer(network net)
+layer_t get_network_detection_layer(network net)
 {
     int i;
     for(i = 0; i < net.n; ++i){
@@ -479,13 +479,13 @@ layer get_network_detection_layer(network net)
         }
     }
     fprintf(stderr, "Detection layer not found!!\n");
-    layer l = {0};
+    layer_t l = {0};
     return l;
 }
 
 image get_network_image_layer(network net, int i)
 {
-    layer l = net.layers[i];
+    layer_t l = net.layers[i];
     if (l.out_w && l.out_h && l.out_c){
         return float_to_image(l.out_w, l.out_h, l.out_c, l.output);
     }
@@ -511,7 +511,7 @@ void visualize_network(network net)
     char buff[256];
     for(i = 0; i < net.n; ++i){
         sprintf(buff, "Layer %d", i);
-        layer l = net.layers[i];
+        layer_t l = net.layers[i];
         if(l.type == CONVOLUTIONAL){
             prev = visualize_convolutional_layer(l, buff, prev);
         }
@@ -596,7 +596,7 @@ void print_network(network net)
 {
     int i,j;
     for(i = 0; i < net.n; ++i){
-        layer l = net.layers[i];
+        layer_t l = net.layers[i];
         float *output = l.output;
         int n = l.outputs;
         float mean = mean_array(output, n);

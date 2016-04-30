@@ -38,7 +38,7 @@ void train_coco(char *cfgfile, char *weightfile)
     data train, buffer;
 
 
-    layer l = net.layers[net.n - 1];
+    layer_t l = net.layers[net.n - 1];
 
     int side = l.side;
     int classes = l.classes;
@@ -173,7 +173,7 @@ void validate_coco(char *cfgfile, char *weightfile)
     //list *plist = get_paths("/home/pjreddie/data/voc/test/2007_test.txt");
     char **paths = (char **)list_to_array(plist);
 
-    layer l = net.layers[net.n-1];
+    layer_t l = net.layers[net.n-1];
     int classes = l.classes;
     int square = l.sqrt;
     int side = l.side;
@@ -263,7 +263,7 @@ void validate_coco_recall(char *cfgfile, char *weightfile)
     list *plist = get_paths("/home/pjreddie/data/voc/test/2007_test.txt");
     char **paths = (char **)list_to_array(plist);
 
-    layer l = net.layers[net.n-1];
+    layer_t l = net.layers[net.n-1];
     int classes = l.classes;
     int square = l.sqrt;
     int side = l.side;
@@ -343,7 +343,7 @@ void test_coco(char *cfgfile, char *weightfile, char *filename, float thresh)
     if(weightfile){
         load_weights(&net, weightfile);
     }
-    layer l = net.layers[net.n-1];
+    layer_t l = net.layers[net.n-1];
     set_batch_network(&net, 1);
     srand(2222222);
     float nms = .4;

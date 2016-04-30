@@ -7,11 +7,11 @@
 #include <stdio.h>
 #include <assert.h>
 
-layer make_softmax_layer(int batch, int inputs, int groups)
+layer_t make_softmax_layer(int batch, int inputs, int groups)
 {
     assert(inputs%groups == 0);
     fprintf(stderr, "Softmax Layer: %d inputs\n", inputs);
-    layer l = {0};
+    layer_t l = {0};
     l.type = SOFTMAX;
     l.batch = batch;
     l.groups = groups;
@@ -44,7 +44,7 @@ void softmax_array(float *input, int n, float temp, float *output)
     }
 }
 
-void forward_softmax_layer(const layer l, network_state state)
+void forward_softmax_layer(const layer_t l, network_state state)
 {
     int b;
     int inputs = l.inputs / l.groups;
@@ -54,7 +54,7 @@ void forward_softmax_layer(const layer l, network_state state)
     }
 }
 
-void backward_softmax_layer(const layer l, network_state state)
+void backward_softmax_layer(const layer_t l, network_state state)
 {
     int i;
     for(i = 0; i < l.inputs*l.batch; ++i){

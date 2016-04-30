@@ -6,15 +6,15 @@
 #include "layer.h"
 #include "network.h"
 
-image get_maxpool_image(layer l);
-layer make_maxpool_layer(int batch, int h, int w, int c, int size, int stride);
-void resize_maxpool_layer(layer *l, int w, int h);
-void forward_maxpool_layer(const layer l, network_state state);
-void backward_maxpool_layer(const layer l, network_state state);
+image get_maxpool_image(layer_t l);
+layer_t make_maxpool_layer(int batch, int h, int w, int c, int size, int stride);
+void resize_maxpool_layer(layer_t *l, int w, int h);
+void forward_maxpool_layer(const layer_t l, network_state state);
+void backward_maxpool_layer(const layer_t l, network_state state);
 
 #ifdef GPU
-void forward_maxpool_layer_gpu(layer l, network_state state);
-void backward_maxpool_layer_gpu(layer l, network_state state);
+void forward_maxpool_layer_gpu(layer_t l, network_state state);
+void backward_maxpool_layer_gpu(layer_t l, network_state state);
 #endif
 
 #endif
