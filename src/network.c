@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdbool.h>
 #include "network.h"
 #include "image.h"
 #include "data.h"
@@ -335,7 +336,7 @@ float train_network_datum(network net, float *x, float *y)
     state.input = x;
     state.delta = 0;
     state.truth = y;
-    state.train = 1;
+    state.train = true;
     forward_network(net, state);
     backward_network(net, state);
     float error = get_network_cost(net);
@@ -386,7 +387,7 @@ float train_network_batch(network net, data d, int n)
     network_state state;
     state.index = 0;
     state.net = net;
-    state.train = 1;
+    state.train = true;
     state.delta = 0;
     float sum = 0;
     int batch = 2;
@@ -537,7 +538,7 @@ float *network_predict(network net, float *input)
     state.index = 0;
     state.input = input;
     state.truth = 0;
-    state.train = 0;
+    state.train = false;
     state.delta = 0;
     forward_network(net, state);
     float *out = get_network_output(net);

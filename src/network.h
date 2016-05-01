@@ -2,6 +2,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include <stdbool.h>
 #include "image.h"
 #include "layer.h"
 #include "data.h"
@@ -48,7 +49,7 @@ typedef struct network_state {
     float *truth;
     float *input;
     float *delta;
-    int train;
+    bool train;
     int index;
     network net;
 } network_state;
