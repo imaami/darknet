@@ -334,7 +334,7 @@ float train_network_datum(network net, float *x, float *y)
     state.index = 0;
     state.net = net;
     state.input = x;
-    state.delta = 0;
+    state.delta = NULL;
     state.truth = y;
     state.train = true;
     forward_network(net, state);
@@ -388,7 +388,7 @@ float train_network_batch(network net, data d, int n)
     state.index = 0;
     state.net = net;
     state.train = true;
-    state.delta = 0;
+    state.delta = NULL;
     float sum = 0;
     int batch = 2;
     for(i = 0; i < n; ++i){
@@ -537,9 +537,9 @@ float *network_predict(network net, float *input)
     state.net = net;
     state.index = 0;
     state.input = input;
-    state.truth = 0;
+    state.truth = NULL;
     state.train = false;
-    state.delta = 0;
+    state.delta = NULL;
     forward_network(net, state);
     float *out = get_network_output(net);
     return out;
