@@ -919,9 +919,9 @@ void load_weights_upto(network *net, char *filename, int cutoff)
 		file_error(filename);
 	}
 
-	int header[3]; // major, minor, revision
-	fread(header, sizeof(int), 3, fp);
-	fread(net->seen, sizeof(int), 1, fp);
+	int header[4]; // major, minor, revision, seen
+	fread(header, sizeof(int), 4, fp);
+	*net->seen = header[3];
 	bool transpose = (header[0] > 1000) || (header[1] > 1000);
 
 	if (net->n < cutoff) {

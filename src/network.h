@@ -6,6 +6,7 @@
 #include "image.h"
 #include "layer.h"
 #include "data.h"
+#include "network_state.h"
 
 typedef enum {
     CONSTANT, STEP, EXP, POLY, STEPS, SIG
@@ -44,15 +45,6 @@ typedef struct network{
     float **truth_gpu;
     #endif
 } network;
-
-typedef struct network_state {
-    float *truth;
-    float *input;
-    float *delta;
-    bool train;
-    int index;
-    network net;
-} network_state;
 
 #ifdef GPU
 float train_network_datum_gpu(network net, float *x, float *y);

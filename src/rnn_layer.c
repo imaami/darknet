@@ -76,7 +76,7 @@ void update_rnn_layer(layer_t l, int batch, float learning_rate, float momentum,
 
 void forward_rnn_layer(layer_t l, network_state state)
 {
-    network_state s = {0};
+    NETWORK_STATE(s);
     s.train = state.train;
     int i;
     layer_t input_layer = *(l.input_layer);
@@ -117,7 +117,7 @@ void forward_rnn_layer(layer_t l, network_state state)
 
 void backward_rnn_layer(layer_t l, network_state state)
 {
-    network_state s = {0};
+    NETWORK_STATE(s);
     s.train = state.train;
     int i;
     layer_t input_layer = *(l.input_layer);
@@ -190,7 +190,7 @@ void update_rnn_layer_gpu(layer_t l, int batch, float learning_rate, float momen
 
 void forward_rnn_layer_gpu(layer_t l, network_state state)
 {
-    network_state s = {0};
+    NETWORK_STATE(s);
     s.train = state.train;
     int i;
     layer_t input_layer = *(l.input_layer);
@@ -231,7 +231,7 @@ void forward_rnn_layer_gpu(layer_t l, network_state state)
 
 void backward_rnn_layer_gpu(layer_t l, network_state state)
 {
-    network_state s = {0};
+    NETWORK_STATE(s);
     s.train = state.train;
     int i;
     layer_t input_layer = *(l.input_layer);

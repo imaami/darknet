@@ -6,6 +6,7 @@
 #include "data.h"
 #include "utils.h"
 #include "blas.h"
+#include "debug.h"
 
 #include "crop_layer.h"
 #include "connected_layer.h"
@@ -130,68 +131,87 @@ network make_network(int n)
 
 void forward_network(network net, network_state state)
 {
-	for (int i = 0; i < net.n; ++i) {
-		state.index = i;
-		layer_t l = net.layers[i];
+	size_t n = (net.n > 0) ? (size_t)net.n : 0;
+//	size_t original_index = state.index;
+	for (state.index = 0; state.index < n; ++state.index) {
+		layer_t l = net.layers[state.index];
 		if (l.delta) {
 			scal_cpu(l.outputs * l.batch, 0, l.delta, 1);
 		}
 		switch (l.type) {
 		case CONVOLUTIONAL:
+			DBG("%s", "convolutional layer");
 			forward_convolutional_layer(l, state);
 			break;
 		case DECONVOLUTIONAL:
+			DBG("%s", "deconvolutional layer");
 			forward_deconvolutional_layer(l, state);
 			break;
 		case ACTIVE:
+			DBG("%s", "activation layer");
 			forward_activation_layer(l, state);
 			break;
 		case LOCAL:
+			DBG("%s", "local layer");
 			forward_local_layer(l, state);
 			break;
 		case NORMALIZATION:
+			DBG("%s", "normalization layer");
 			forward_normalization_layer(l, state);
 			break;
 		case DETECTION:
+			DBG("%s", "detection layer");
 			forward_detection_layer(l, state);
 			break;
 		case CONNECTED:
+			DBG("%s", "connected layer");
 			forward_connected_layer(l, state);
 			break;
 		case RNN:
+			DBG("%s", "RNN layer");
 			forward_rnn_layer(l, state);
 			break;
 		case CRNN:
+			DBG("%s", "CRNN layer");
 			forward_crnn_layer(l, state);
 			break;
 		case CROP:
+			DBG("%s", "crop layer");
 			forward_crop_layer(l, state);
 			break;
 		case COST:
+			DBG("%s", "cost layer");
 			forward_cost_layer(l, state);
 			break;
 		case SOFTMAX:
+			DBG("%s", "softmax layer");
 			forward_softmax_layer(l, state);
 			break;
 		case MAXPOOL:
+			DBG("%s", "maxpool layer");
 			forward_maxpool_layer(l, state);
 			break;
 		case AVGPOOL:
+			DBG("%s", "avgpool layer");
 			forward_avgpool_layer(l, state);
 			break;
 		case DROPOUT:
+			DBG("%s", "dropout layer");
 			forward_dropout_layer(l, state);
 			break;
 		case ROUTE:
+			DBG("%s", "route layer");
 			forward_route_layer(l, net);
 			break;
 		case SHORTCUT:
+			DBG("%s", "shortcut layer");
 			forward_shortcut_layer(l, state);
 		default:
 			break;
 		}
 		state.input = l.output;
 	}
+//	state.index = original_index;
 }
 
 static void update_network(network net)
@@ -202,21 +222,27 @@ static void update_network(network net)
 		layer_t l = net.layers[i];
 		switch (l.type) {
 		case CONVOLUTIONAL:
+			DBG("%s", "convolutional layer");
 			update_convolutional_layer(l, update_batch, rate, net.momentum, net.decay);
 			break;
 		case DECONVOLUTIONAL:
+			DBG("%s", "deconvolutional layer");
 			update_deconvolutional_layer(l, rate, net.momentum, net.decay);
 			break;
 		case CONNECTED:
+			DBG("%s", "connected layer");
 			update_connected_layer(l, update_batch, rate, net.momentum, net.decay);
 			break;
 		case RNN:
+			DBG("%s", "RNN layer");
 			update_rnn_layer(l, update_batch, rate, net.momentum, net.decay);
 			break;
 		case CRNN:
+			DBG("%s", "CRNN layer");
 			update_crnn_layer(l, update_batch, rate, net.momentum, net.decay);
 			break;
 		case LOCAL:
+			DBG("%s", "local layer");
 			update_local_layer(l, update_batch, rate, net.momentum, net.decay);
 		default:
 			break;
@@ -231,20 +257,23 @@ float *get_network_output(network net)
     return net.layers[i].output;
 }
 
-static float get_network_cost(network net)
+static float get_network_cost(network *net)
 {
 	float sum = 0;
-	int count = 0;
-	for (int i = 0; i < net.n; ++i) {
-		switch (net.layers[i].type) {
+	int count = 0, i = 0, n = net->n;
+	layer_t *layers = net->layers;
+
+	for (; i < n; ++i) {
+		switch (layers[i].type) {
 		case COST:
 		case DETECTION:
-			sum += net.layers[i].cost[0];
+			sum += layers[i].cost[0];
 			++count;
 		default:
 			break;
 		}
 	}
+
 	return sum / count; // TODO: watch out for div-by-zero
 }
 
@@ -259,89 +288,105 @@ void backward_network(network net, network_state state)
 {
 	float *original_input = state.input;
 	float *original_delta = state.delta;
-	for (int i = net.n-1; i >= 0; --i) {
-		state.index = i;
-		if (i == 0) {
+//	size_t original_index = state.index;
+	state.index = (net.n > 0) ? (size_t)net.n : 0;
+	while (state.index > 0) {
+		--state.index;
+		if (state.index == 0) {
 			state.input = original_input;
 			state.delta = original_delta;
 		} else {
-			layer_t prev = net.layers[i-1];
-			state.input = prev.output;
-			state.delta = prev.delta;
+			layer_t *prev = net.layers + (state.index - 1);
+			state.input = prev->output;
+			state.delta = prev->delta;
 		}
-		layer_t l = net.layers[i];
+		layer_t l = net.layers[state.index];
 		switch (l.type) {
 		case CONVOLUTIONAL:
+			DBG("%s", "convolutional layer");
 			backward_convolutional_layer(l, state);
 			break;
 		case DECONVOLUTIONAL:
+			DBG("%s", "deconvolutional layer");
 			backward_deconvolutional_layer(l, state);
 			break;
 		case ACTIVE:
+			DBG("%s", "activation layer");
 			backward_activation_layer(l, state);
 			break;
 		case NORMALIZATION:
+			DBG("%s", "normalization layer");
 			backward_normalization_layer(l, state);
 			break;
 		case MAXPOOL:
+			DBG("%s", "maxpool layer");
 			backward_maxpool_layer(l, state);
 			break;
 		case AVGPOOL:
+			DBG("%s", "avgpool layer");
 			backward_avgpool_layer(l, state);
 			break;
 		case DROPOUT:
+			DBG("%s", "dropout layer");
 			backward_dropout_layer(l, state);
 			break;
 		case DETECTION:
+			DBG("%s", "detection layer");
 			backward_detection_layer(l, state);
 			break;
 		case SOFTMAX:
+			DBG("%s", "softmax layer");
 			backward_softmax_layer(l, state);
 			break;
 		case CONNECTED:
+			DBG("%s", "connected layer");
 			backward_connected_layer(l, state);
 			break;
 		case RNN:
+			DBG("%s", "RNN layer");
 			backward_rnn_layer(l, state);
 			break;
 		case CRNN:
+			DBG("%s", "CRNN layer");
 			backward_crnn_layer(l, state);
 			break;
 		case LOCAL:
+			DBG("%s", "local layer");
 			backward_local_layer(l, state);
 			break;
 		case COST:
+			DBG("%s", "cost layer");
 			backward_cost_layer(l, state);
 			break;
 		case ROUTE:
+			DBG("%s", "route layer");
 			backward_route_layer(l, net);
 			break;
 		case SHORTCUT:
+			DBG("%s", "shortcut layer");
 			backward_shortcut_layer(l, state);
 		default:
 			break;
 		}
 	}
+//	state.index = original_index;
 }
 
 float train_network_datum(network net, float *x, float *y)
 {
-    *net.seen += net.batch;
+	*net.seen += net.batch;
 #ifdef GPU
-    if(gpu_index >= 0) return train_network_datum_gpu(net, x, y);
+	if(gpu_index >= 0) return train_network_datum_gpu(net, x, y);
 #endif
-    network_state state;
-    state.index = 0;
-    state.net = net;
-    state.input = x;
-    state.delta = NULL;
-    state.truth = y;
-    state.train = true;
-    forward_network(net, state);
-    backward_network(net, state);
-    float error = get_network_cost(net);
-    if(((*net.seen)/net.batch)%net.subdivisions == 0) update_network(net);
-    return error;
+	network_state state;
+	network_state_init(&state, &net, 0, true, NULL, x, y);
+	forward_network(net, state);
+	backward_network(net, state);
+	float error = get_network_cost(&net);
+	if ((*net.seen / net.batch) % net.subdivisions == 0) {
+		update_network(net);
+	}
+	return error;
 }
 
 float train_network_sgd(network net, data d, int n)
@@ -385,10 +430,7 @@ float train_network_batch(network net, data d, int n)
 {
     int i,j;
     network_state state;
-    state.index = 0;
-    state.net = net;
-    state.train = true;
-    state.delta = NULL;
+    network_state_init(&state, &net, 0, true, NULL, NULL, NULL);
     float sum = 0;
     int batch = 2;
     for(i = 0; i < n; ++i){
@@ -398,7 +440,7 @@ float train_network_batch(network net, data d, int n)
             state.truth = d.y.vals[index];
             forward_network(net, state);
             backward_network(net, state);
-            sum += get_network_cost(net);
+            sum += get_network_cost(&net);
         }
         update_network(net);
     }
@@ -534,12 +576,7 @@ float *network_predict(network net, float *input)
 #endif
 
     network_state state;
-    state.net = net;
-    state.index = 0;
-    state.input = input;
-    state.truth = NULL;
-    state.train = false;
-    state.delta = NULL;
+    network_state_init(&state, &net, 0, false, NULL, input, NULL);
     forward_network(net, state);
     float *out = get_network_output(net);
     return out;

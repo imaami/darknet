@@ -2,6 +2,7 @@
 #include "cost_layer.h"
 #include "utils.h"
 #include "parser.h"
+#include "debug.h"
 
 #ifdef OPENCV
 #include "opencv2/highgui/highgui_c.h"
@@ -75,7 +76,10 @@ void train_char_rnn(char *cfgfile, char *weightfile, char *filename)
     int i = (*net.seen)/net.batch;
 
     clock_t time;
-    while(get_current_batch(net) < net.max_batches){
+    int cb;
+    char buff[256];
+    while ((cb = get_current_batch(net)) < net.max_batches) {
+        DBG("current batch: %d of %d", cb, net.max_batches);
         i += 1;
         time=clock();
         float_pair p = get_rnn_data(text, inputs, size, batch/steps, steps);
@@ -88,17 +92,12 @@ void train_char_rnn(char *cfgfile, char *weightfile, char *filename)
 
         fprintf(stderr, "%d: %f, %f avg, %f rate, %lf seconds\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time));
         if(i%100==0){
-            char buff[256];
             sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
             save_weights(net, buff);
         }
-        if(i%10==0){
-            char buff[256];
-            sprintf(buff, "%s/%s.backup", backup_directory, base);
-            save_weights(net, buff);
-        }
+        sprintf(buff, "%s/%s.backup", backup_directory, base);
+        save_weights(net, buff);
     }
-    char buff[256];
     sprintf(buff, "%s/%s_final.weights", backup_directory, base);
     save_weights(net, buff);
 }

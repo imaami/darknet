@@ -273,7 +273,7 @@ void test_convolutional_layer()
         3,3,3,3,3,
         3,3,3,3,3,
         3,3,3,3,3};
-    network_state state = {0};
+    NETWORK_STATE(state);
     state.input = data;
     forward_convolutional_layer(l, state);
 }
