@@ -1,3 +1,4 @@
+#include "layer.h"
 #include "crnn_layer.h"
 #include "convolutional_layer.h"
 #include "utils.h"
@@ -9,22 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-static void increment_layer(layer_t *l, int steps)
-{
-    int num = l->outputs*l->batch*steps;
-    l->output += num;
-    l->delta += num;
-    l->x += num;
-    l->x_norm += num;
-
-#ifdef GPU
-    l->output_gpu += num;
-    l->delta_gpu += num;
-    l->x_gpu += num;
-    l->x_norm_gpu += num;
-#endif
-}
 
 layer_t make_crnn_layer(int batch, int h, int w, int c, int hidden_filters, int output_filters, int steps, ACTIVATION activation, int batch_normalize)
 {

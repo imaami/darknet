@@ -2,6 +2,23 @@
 #include "cuda.h"
 #include <stdlib.h>
 
+void increment_layer (layer_t *layer,
+                      int      steps)
+{
+	int num = layer->outputs * layer->batch * steps;
+	layer->output += num;
+	layer->delta += num;
+	layer->x += num;
+	layer->x_norm += num;
+
+#ifdef GPU
+	layer->output_gpu += num;
+	layer->delta_gpu += num;
+	layer->x_gpu += num;
+	layer->x_norm_gpu += num;
+#endif
+}
+
 void free_layer(layer_t l)
 {
     if(l.type == DROPOUT){

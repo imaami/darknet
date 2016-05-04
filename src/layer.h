@@ -177,6 +177,9 @@ struct layer {
     #endif
 };
 
+extern void increment_layer (layer_t *layer,
+                             int      steps);
+
 void free_layer(layer_t);
 
 #endif
