@@ -88,7 +88,7 @@ void forward_local_layer(const layer_t l, network_state state)
     int locations = out_h * out_w;
 
     for(i = 0; i < l.batch; ++i){
-        copy_cpu(l.outputs, l.biases, 1, l.output + i*l.outputs, 1);
+        fltcpy(l.output + i * l.outputs, l.biases, l.outputs);
     }
 
     for(i = 0; i < l.batch; ++i){
@@ -119,7 +119,7 @@ void backward_local_layer(layer_t l, network_state state)
     gradient_array(l.output, l.outputs*l.batch, l.activation, l.delta);
 
     for(i = 0; i < l.batch; ++i){
-        axpy_cpu(l.outputs, 1, l.delta + i*l.outputs, 1, l.bias_updates, 1);
+        fltadd(l.bias_updates, l.delta + i * l.outputs, l.outputs);
     }
 
     for(i = 0; i < l.batch; ++i){
@@ -160,11 +160,11 @@ void update_local_layer(layer_t l, int batch, float learning_rate, float momentu
 {
     int locations = l.out_w*l.out_h;
     int size = l.size*l.size*l.c*l.n*locations;
-    axpy_cpu(l.outputs, learning_rate/batch, l.bias_updates, 1, l.biases, 1);
+    fltaddmul(l.biases, l.bias_updates, l.outputs, learning_rate / batch);
     scal_cpu(l.outputs, momentum, l.bias_updates, 1);
 
-    axpy_cpu(size, -decay*batch, l.filters, 1, l.filter_updates, 1);
-    axpy_cpu(size, learning_rate/batch, l.filter_updates, 1, l.filters, 1);
+    fltaddmul(l.filter_updates, l.filters, size, -decay * batch);
+    fltaddmul(l.filters, l.filter_updates, size, learning_rate / batch);
     scal_cpu(size, momentum, l.filter_updates, 1);
 }
 

@@ -90,7 +90,7 @@ float cuda_compare(float *x_gpu, float *x, int n, char *s)
     cuda_pull_array(x_gpu, tmp, n);
     //int i;
     //for(i = 0; i < n; ++i) printf("%f %f\n", tmp[i], x[i]);
-    axpy_cpu(n, -1, x, 1, tmp, 1);
+    fltaddmul(tmp, x, n, -1);
     float err = dot_cpu(n, tmp, 1, tmp, 1);
     printf("Error %s: %f\n", s, sqrt(err/n));
     free(tmp);

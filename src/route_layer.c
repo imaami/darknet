@@ -39,7 +39,7 @@ void forward_route_layer(const layer_t l, network net)
         float *input = net.layers[index].output;
         int input_size = l.input_sizes[i];
         for(j = 0; j < l.batch; ++j){
-            copy_cpu(input_size, input + j*input_size, 1, l.output + offset + j*l.outputs, 1);
+            fltcpy(l.output + offset + j * l.outputs, input + j * input_size, input_size);
         }
         offset += input_size;
     }
@@ -54,7 +54,7 @@ void backward_route_layer(const layer_t l, network net)
         float *delta = net.layers[index].delta;
         int input_size = l.input_sizes[i];
         for(j = 0; j < l.batch; ++j){
-            axpy_cpu(input_size, 1, l.delta + offset + j*l.outputs, 1, delta + j*input_size, 1);
+            fltadd(delta + j * input_size, l.delta + offset + j * l.outputs, input_size);
         }
         offset += input_size;
     }

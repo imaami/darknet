@@ -28,22 +28,6 @@ void shortcut_cpu(int batch, int w1, int h1, int c1, float *add, int w2, int h2,
     }
 }
 
-void mean_cpu(float *x, int batch, int filters, int spatial, float *mean)
-{
-    float scale = 1./(batch * spatial);
-    int i,j,k;
-    for(i = 0; i < filters; ++i){
-        mean[i] = 0;
-        for(j = 0; j < batch; ++j){
-            for(k = 0; k < spatial; ++k){
-                int index = j*filters*spatial + i*spatial + k;
-                mean[i] += x[index];
-            }
-        }
-        mean[i] *= scale;
-    }
-}
-
 void variance_cpu(float *x, float *mean, int batch, int filters, int spatial, float *variance)
 {
     float scale = 1./(batch * spatial - 1);
@@ -91,28 +75,10 @@ void pow_cpu(int N, float ALPHA, float *X, int INCX, float *Y, int INCY)
     for(i = 0; i < N; ++i) Y[i*INCY] = pow(X[i*INCX], ALPHA);
 }
 
-void axpy_cpu(int N, float ALPHA, float *X, int INCX, float *Y, int INCY)
-{
-    int i;
-    for(i = 0; i < N; ++i) Y[i*INCY] += ALPHA*X[i*INCX];
-}
-
 void scal_cpu(int N, float ALPHA, float *X, int INCX)
 {
     int i;
     for(i = 0; i < N; ++i) X[i*INCX] *= ALPHA;
-}
-
-void fill_cpu(int N, float ALPHA, float *X, int INCX)
-{
-    int i;
-    for(i = 0; i < N; ++i) X[i*INCX] = ALPHA;
-}
-
-void copy_cpu(int N, float *X, int INCX, float *Y, int INCY)
-{
-    int i;
-    for(i = 0; i < N; ++i) Y[i*INCY] = X[i*INCX];
 }
 
 void smooth_l1_cpu(int n, float *pred, float *truth, float *delta, float *error)

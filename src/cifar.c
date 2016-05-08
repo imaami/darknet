@@ -133,10 +133,10 @@ void test_cifar_multi(char *filename, char *weightfile)
         float pred[10] = {0};
 
         float *p = network_predict(net, im.data);
-        axpy_cpu(10, 1, p, 1, pred, 1);
+        fltadd(pred, p, 10);
         flip_image(im);
         p = network_predict(net, im.data);
-        axpy_cpu(10, 1, p, 1, pred, 1);
+        fltadd(pred, p, 10);
 
         int index = max_index(pred, 10);
         int class = max_index(test.y.vals[i], 10);

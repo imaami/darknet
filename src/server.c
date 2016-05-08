@@ -54,7 +54,7 @@ void read_and_add_into(int fd, float *a, int n)
 {
     float *buff = calloc(n, sizeof(float));
     read_all(fd, (char*) buff, n*sizeof(float));
-    axpy_cpu(n, 1, buff, 1, a, 1);
+    fltadd(a, buff, n);
     free(buff);
 }
 

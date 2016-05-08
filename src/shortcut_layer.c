@@ -32,7 +32,7 @@ layer_t make_shortcut_layer(int batch, int index, int w, int h, int c, int w2, i
 
 void forward_shortcut_layer(const layer_t l, network_state state)
 {
-    copy_cpu(l.outputs*l.batch, state.input, 1, l.output, 1);
+    fltcpy(l.output, state.input, l.outputs * l.batch);
     shortcut_cpu(l.batch, l.w, l.h, l.c, state.net->layers[l.index].output, l.out_w, l.out_h, l.out_c, l.output);
     activate_array(l.output, l.outputs*l.batch, l.activation);
 }
@@ -40,7 +40,7 @@ void forward_shortcut_layer(const layer_t l, network_state state)
 void backward_shortcut_layer(const layer_t l, network_state state)
 {
     gradient_array(l.output, l.outputs*l.batch, l.activation, l.delta);
-    axpy_cpu(l.outputs*l.batch, 1, l.delta, 1, state.delta, 1);
+    fltadd(state.delta, l.delta, l.outputs * l.batch);
     shortcut_cpu(l.batch, l.out_w, l.out_h, l.out_c, l.delta, l.w, l.h, l.c, state.net->layers[l.index].delta);
 }
 

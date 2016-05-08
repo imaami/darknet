@@ -171,7 +171,7 @@ void generate_vid_rnn(char *cfgfile, char *weightfile)
             printf("%f %f\n", mean_array(feat, 14*14*512), variance_array(feat, 14*14*512));
             printf("%f %f\n", mean_array(next, 14*14*512), variance_array(next, 14*14*512));
             printf("%f\n", mse_array(feat, 14*14*512));
-            axpy_cpu(14*14*512, -1, feat, 1, next, 1);
+            fltaddmul(next, feat, 14 * 14 * 512, -1);
             printf("%f\n", mse_array(next, 14*14*512));
         }
         next = network_predict(net, feat);

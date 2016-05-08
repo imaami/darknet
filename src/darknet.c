@@ -61,12 +61,12 @@ static void average(int argc, char *argv[])
             layer_t out = sum.layers[j];
             if(l.type == CONVOLUTIONAL){
                 int num = l.n*l.c*l.size*l.size;
-                axpy_cpu(l.n, 1, l.biases, 1, out.biases, 1);
-                axpy_cpu(num, 1, l.filters, 1, out.filters, 1);
+                fltadd(out.biases, l.biases, l.n);
+                fltadd(out.filters, l.filters, num);
             }
             if(l.type == CONNECTED){
-                axpy_cpu(l.outputs, 1, l.biases, 1, out.biases, 1);
-                axpy_cpu(l.outputs*l.inputs, 1, l.weights, 1, out.weights, 1);
+                fltadd(out.biases, l.biases, l.outputs);
+                fltadd(out.weights, l.weights, l.outputs * l.inputs);
             }
         }
     }

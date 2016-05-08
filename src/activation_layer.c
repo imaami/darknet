@@ -32,14 +32,14 @@ layer_t make_activation_layer(int batch, int inputs, ACTIVATION activation)
 
 void forward_activation_layer(layer_t l, network_state state)
 {
-    copy_cpu(l.outputs*l.batch, state.input, 1, l.output, 1);
+    fltcpy(l.output, state.input, l.outputs * l.batch);
     activate_array(l.output, l.outputs*l.batch, l.activation);
 }
 
 void backward_activation_layer(layer_t l, network_state state)
 {
     gradient_array(l.output, l.outputs*l.batch, l.activation, l.delta);
-    copy_cpu(l.outputs*l.batch, l.delta, 1, state.delta, 1);
+    fltcpy(state.delta, l.delta, l.outputs * l.batch);
 }
 
 #ifdef GPU

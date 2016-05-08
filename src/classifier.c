@@ -257,7 +257,7 @@ void validate_classifier_10(char *datacfg, char *filename, char *weightfile)
         float *pred = calloc(classes, sizeof(float));
         for(j = 0; j < 10; ++j){
             float *p = network_predict(net, images[j].data);
-            axpy_cpu(classes, 1, p, 1, pred, 1);
+            fltadd(pred, p, classes);
             free_image(images[j]);
         }
         free_image(im);
@@ -436,10 +436,10 @@ void validate_classifier_multi(char *datacfg, char *filename, char *weightfile)
             image r = resize_min(im, scales[j]);
             resize_network(&net, r.w, r.h);
             float *p = network_predict(net, r.data);
-            axpy_cpu(classes, 1, p, 1, pred, 1);
+            fltadd(pred, p, classes);
             flip_image(r);
             p = network_predict(net, r.data);
-            axpy_cpu(classes, 1, p, 1, pred, 1);
+            fltadd(pred, p, classes);
             free_image(r);
         }
         free_image(im);

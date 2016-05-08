@@ -72,15 +72,15 @@ void forward_normalization_layer(const layer_t layer, network_state state)
 
         const_cpu(w*h, layer.kappa, norms, 1);
         for(k = 0; k < layer.size/2; ++k){
-            axpy_cpu(w*h, layer.alpha, squared + w*h*k, 1, norms, 1);
+            fltaddmul(norms, squared + w * h * k, w * h, layer.alpha);
         }
 
         for(k = 1; k < layer.c; ++k){
-            copy_cpu(w*h, norms + w*h*(k-1), 1, norms + w*h*k, 1);
+            fltcpy(norms + w * h * k, norms + w * h * (k - 1), w * h);
             int prev = k - ((layer.size-1)/2) - 1;
             int next = k + (layer.size/2);
-            if(prev >= 0)      axpy_cpu(w*h, -layer.alpha, squared + w*h*prev, 1, norms + w*h*k, 1);
-            if(next < layer.c) axpy_cpu(w*h,  layer.alpha, squared + w*h*next, 1, norms + w*h*k, 1);
+            if(prev >= 0)      fltaddmul(norms + w * h * k, squared + w * h * prev, w * h, -layer.alpha);
+            if(next < layer.c) fltaddmul(norms + w * h * k, squared + w * h * next, w * h, layer.alpha);
         }
     }
     pow_cpu(w*h*c*layer.batch, -layer.beta, layer.norms, 1, layer.output, 1);

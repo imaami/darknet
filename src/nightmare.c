@@ -73,7 +73,7 @@ void optimize_picture(network *net, image orig, int max_layer, float scale, floa
     state.input = im.data;
     state.delta = delta.data;
     forward_network(*net, state);
-    copy_cpu(last.outputs, last.output, 1, last.delta, 1);
+    fltcpy(last.delta, last.output, last.outputs);
     calculate_loss(last.output, last.delta, last.outputs, thresh);
     backward_network(*net, state);
 #endif
@@ -92,7 +92,7 @@ void optimize_picture(network *net, image orig, int max_layer, float scale, floa
     //rate = rate / abs_mean(out.data, out.w*out.h*out.c);
 
     if(norm) normalize_array(out.data, out.w*out.h*out.c);
-    axpy_cpu(orig.w*orig.h*orig.c, rate, out.data, 1, orig.data, 1);
+    fltaddmul(orig.data, out.data, orig.w * orig.h * orig.c, rate);
 
     /*
        normalize_array(orig.data, orig.w*orig.h*orig.c);
@@ -164,10 +164,10 @@ void reconstruct_picture(network net, float *features, image recon, image update
         backward_network(net, state);
 #endif
 
-        axpy_cpu(recon.w*recon.h*recon.c, 1, delta.data, 1, update.data, 1);
+        fltadd(update.data, delta.data, recon.w * recon.h * recon.c);
         smooth(recon, update, lambda, smooth_size);
 
-        axpy_cpu(recon.w*recon.h*recon.c, rate, update.data, 1, recon.data, 1);
+        fltaddmul(recon.data, update.data, recon.w * recon.h * recon.c, rate);
         scal_cpu(recon.w*recon.h*recon.c, momentum, update.data, 1);
 
         //float mag = mag_array(recon.data, recon.w*recon.h*recon.c);

@@ -181,7 +181,7 @@ void forward_detection_layer(const layer_t l, network_state state)
 
 void backward_detection_layer(const layer_t l, network_state state)
 {
-    axpy_cpu(l.batch*l.inputs, 1, l.delta, 1, state.delta, 1);
+    fltadd(state.delta, l.delta, l.batch * l.inputs);
 }
 
 #ifdef GPU

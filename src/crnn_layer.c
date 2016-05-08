@@ -74,10 +74,10 @@ void forward_crnn_layer(layer_t l, network_state state)
     layer_t self_layer = *(l.self_layer);
     layer_t output_layer = *(l.output_layer);
 
-    fill_cpu(l.outputs * l.batch * l.steps, 0, output_layer.delta, 1);
-    fill_cpu(l.hidden * l.batch * l.steps, 0, self_layer.delta, 1);
-    fill_cpu(l.hidden * l.batch * l.steps, 0, input_layer.delta, 1);
-    if(state.train) fill_cpu(l.hidden * l.batch, 0, l.state, 1);
+    memset(output_layer.delta, 0, sizeof(float) * l.outputs * l.batch * l.steps);
+    memset(self_layer.delta, 0, sizeof(float) * l.hidden * l.batch * l.steps);
+    memset(input_layer.delta, 0, sizeof(float) * l.hidden * l.batch * l.steps);
+    if(state.train) memset(l.state, 0, sizeof(float) * l.hidden * l.batch);
 
     for (i = 0; i < l.steps; ++i) {
         s.input = state.input;
@@ -89,12 +89,12 @@ void forward_crnn_layer(layer_t l, network_state state)
         float *old_state = l.state;
         if(state.train) l.state += l.hidden*l.batch;
         if(l.shortcut){
-            copy_cpu(l.hidden * l.batch, old_state, 1, l.state, 1);
+            fltcpy(l.state, old_state, l.hidden * l.batch);
         }else{
-            fill_cpu(l.hidden * l.batch, 0, l.state, 1);
+            memset(l.state, 0, sizeof(float) * l.hidden * l.batch);
         }
-        axpy_cpu(l.hidden * l.batch, 1, input_layer.output, 1, l.state, 1);
-        axpy_cpu(l.hidden * l.batch, 1, self_layer.output, 1, l.state, 1);
+        fltadd(l.state, input_layer.output, l.hidden * l.batch);
+        fltadd(l.state, self_layer.output, l.hidden * l.batch);
 
         s.input = l.state;
         forward_convolutional_layer(output_layer, s);
@@ -121,8 +121,8 @@ void backward_crnn_layer(layer_t l, network_state state)
 
     l.state += l.hidden*l.batch*l.steps;
     for (i = l.steps-1; i >= 0; --i) {
-        copy_cpu(l.hidden * l.batch, input_layer.output, 1, l.state, 1);
-        axpy_cpu(l.hidden * l.batch, 1, self_layer.output, 1, l.state, 1);
+        fltcpy(l.state, input_layer.output, l.hidden * l.batch);
+        fltadd(l.state, self_layer.output, l.hidden * l.batch);
 
         s.input = l.state;
         s.delta = self_layer.delta;
@@ -131,10 +131,10 @@ void backward_crnn_layer(layer_t l, network_state state)
         l.state -= l.hidden*l.batch;
         /*
            if(i > 0){
-           copy_cpu(l.hidden * l.batch, input_layer.output - l.hidden*l.batch, 1, l.state, 1);
-           axpy_cpu(l.hidden * l.batch, 1, self_layer.output - l.hidden*l.batch, 1, l.state, 1);
+           fltcpy(l.state, input_layer.output - l.hidden * l.batch, l.hidden * l.batch);
+           fltadd(l.state, self_layer.output - l.hidden * l.batch, l.hidden * l.batch);
            }else{
-           fill_cpu(l.hidden * l.batch, 0, l.state, 1);
+           memset(l.state, 0, sizeof(float) * l.hidden * l.batch);
            }
          */
 
@@ -143,8 +143,8 @@ void backward_crnn_layer(layer_t l, network_state state)
         if (i == 0) s.delta = NULL;
         backward_convolutional_layer(self_layer, s);
 
-        copy_cpu(l.hidden*l.batch, self_layer.delta, 1, input_layer.delta, 1);
-        if (i > 0 && l.shortcut) axpy_cpu(l.hidden*l.batch, 1, self_layer.delta, 1, self_layer.delta - l.hidden*l.batch, 1);
+        fltcpy(input_layer.delta, self_layer.delta, l.hidden * l.batch);
+        if (i > 0 && l.shortcut) fltadd(self_layer.delta - l.hidden * l.batch, self_layer.delta, l.hidden * l.batch);
         s.input = state.input + i*l.inputs*l.batch;
         if(state.delta) s.delta = state.delta + i*l.inputs*l.batch;
         else s.delta = NULL;

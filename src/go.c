@@ -189,7 +189,7 @@ void test_go(char *filename, char *weightfile, int multi)
     int color = 1;
     while(1){
         float *output = network_predict(net, board);
-        copy_cpu(19*19, output, 1, move, 1);
+        fltcpy(move, output, 19 * 19);
         int i;
         if(multi){
             image bim = float_to_image(19, 19, 1, board);
@@ -203,7 +203,7 @@ void test_go(char *filename, char *weightfile, int multi)
                 if(i >= 4) flip_image(oim);
                 rotate_image_cw(oim, -i);
 
-                axpy_cpu(19*19, 1, output, 1, move, 1);
+                fltadd(move, output, 19 * 19);
 
                 if(i >= 4) flip_image(bim);
                 rotate_image_cw(bim, -i);

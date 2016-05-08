@@ -7,6 +7,7 @@
 #include "gemm.h"
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 int deconvolutional_out_height(layer_t l)
 {
@@ -134,7 +135,7 @@ void forward_deconvolutional_layer(const layer_t l, network_state state)
     int n = l.h*l.w;
     int k = l.c;
 
-    fill_cpu(l.outputs*l.batch, 0, l.output, 1);
+    memset(l.output, 0, sizeof(float) * l.outputs * l.batch);
 
     for(i = 0; i < l.batch; ++i){
         float *a = l.filters;
@@ -190,11 +191,11 @@ void backward_deconvolutional_layer(layer_t l, network_state state)
 void update_deconvolutional_layer(layer_t l, float learning_rate, float momentum, float decay)
 {
     int size = l.size*l.size*l.c*l.n;
-    axpy_cpu(l.n, learning_rate, l.bias_updates, 1, l.biases, 1);
+    fltaddmul(l.biases, l.bias_updates, l.n, learning_rate);
     scal_cpu(l.n, momentum, l.bias_updates, 1);
 
-    axpy_cpu(size, -decay, l.filters, 1, l.filter_updates, 1);
-    axpy_cpu(size, learning_rate, l.filter_updates, 1, l.filters, 1);
+    fltaddmul(l.filter_updates, l.filters, size, -decay);
+    fltaddmul(l.filters, l.filter_updates, size, learning_rate);
     scal_cpu(size, momentum, l.filter_updates, 1);
 }
 

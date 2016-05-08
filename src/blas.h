@@ -1,5 +1,41 @@
 #ifndef BLAS_H
 #define BLAS_H
+
+#include <stddef.h>
+
+__attribute__((always_inline))
+static inline void fltcpy (float  *dest,
+                           float  *src,
+                           size_t  n)
+{
+	for (; n; --n) {
+		*dest++ = *src++;
+	}
+}
+
+__attribute__((always_inline))
+static inline void fltadd (float  *dest,
+                           float  *src,
+                           size_t  n)
+{
+	for (; n; --n) {
+		*dest++ += *src++;
+	}
+}
+
+__attribute__((always_inline))
+static inline void fltaddmul (float  *dest,
+                              float  *src,
+                              size_t  n,
+                              float   alpha)
+{
+	for (; n; --n) {
+		float s = *src++;
+		s *= alpha;
+		*dest++ += s;
+	}
+}
+
 void pm(int M, int N, float *A);
 float *random_matrix(int rows, int cols);
 void time_random_matrix(int TA, int TB, int m, int k, int n);
@@ -10,15 +46,11 @@ void const_cpu(int N, float ALPHA, float *X, int INCX);
 void pow_cpu(int N, float ALPHA, float *X, int INCX, float *Y, int INCY);
 void mul_cpu(int N, float *X, int INCX, float *Y, int INCY);
 
-void axpy_cpu(int N, float ALPHA, float *X, int INCX, float *Y, int INCY);
-void copy_cpu(int N, float *X, int INCX, float *Y, int INCY);
 void scal_cpu(int N, float ALPHA, float *X, int INCX);
-void fill_cpu(int N, float ALPHA, float * X, int INCX);
 float dot_cpu(int N, float *X, int INCX, float *Y, int INCY);
 void test_gpu_blas();
 void shortcut_cpu(int batch, int w1, int h1, int c1, float *add, int w2, int h2, int c2, float *out);
 
-void mean_cpu(float *x, int batch, int filters, int spatial, float *mean);
 void variance_cpu(float *x, float *mean, int batch, int filters, int spatial, float *variance);
 void normalize_cpu(float *x, float *mean, float *variance, int batch, int filters, int spatial);
 

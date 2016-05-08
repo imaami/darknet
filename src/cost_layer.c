@@ -83,7 +83,7 @@ void forward_cost_layer(layer_t l, network_state state)
 
 void backward_cost_layer(const layer_t l, network_state state)
 {
-    axpy_cpu(l.batch*l.inputs, l.scale, l.delta, 1, state.delta, 1);
+    fltaddmul(state.delta, l.delta, l.batch * l.inputs, l.scale);
 }
 
 #ifdef GPU

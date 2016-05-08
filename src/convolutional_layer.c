@@ -6,6 +6,7 @@
 #include "gemm.h"
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 void swap_binary(layer_t *l)
 {
@@ -343,13 +344,31 @@ void backward_bias(float *bias_updates, float *delta, int batch, int n, int size
     }
 }
 
+__attribute__((always_inline))
+static inline void convolutional_layer_mean(layer_t *l)
+{
+	size_t b = l->batch, n = l->n, s = l->out_h * l->out_w;
+	float *src = l->output, *mean = l->mean, scale = 1.0f / (b * s);
+
+	for (size_t i = 0; i < n; ++i) {
+		mean[i] = 0.0f;
+		for (size_t j = 0; j < b; ++j) {
+			for (size_t k = 0; k < s; ++k) {
+				size_t idx = (j * n * s) + (i * s) + k;
+				mean[i] += src[idx];
+			}
+		}
+		mean[i] *= scale;
+	}
+}
+
 void forward_convolutional_layer(layer_t l, network_state state)
 {
     int out_h = convolutional_out_height(l);
     int out_w = convolutional_out_width(l);
     int i;
 
-    fill_cpu(l.outputs*l.batch, 0, l.output, 1);
+    memset(l.output, 0, sizeof(float) * l.outputs * l.batch);
     /*
     if(l.binary){
         binarize_filters(l.filters, l.n, l.c*l.size*l.size, l.binary_filters);
@@ -398,7 +417,7 @@ void forward_convolutional_layer(layer_t l, network_state state)
 
     if(l.batch_normalize){
         if(state.train){
-            mean_cpu(l.output, l.batch, l.n, l.out_h*l.out_w, l.mean);   
+            convolutional_layer_mean(&l);
             variance_cpu(l.output, l.mean, l.batch, l.n, l.out_h*l.out_w, l.variance);   
             normalize_cpu(l.output, l.mean, l.variance, l.batch, l.n, l.out_h*l.out_w);   
         } else {
@@ -448,11 +467,11 @@ void backward_convolutional_layer(layer_t l, network_state state)
 void update_convolutional_layer(layer_t l, int batch, float learning_rate, float momentum, float decay)
 {
     int size = l.size*l.size*l.c*l.n;
-    axpy_cpu(l.n, learning_rate/batch, l.bias_updates, 1, l.biases, 1);
+    fltaddmul(l.biases, l.bias_updates, l.n, learning_rate / batch);
     scal_cpu(l.n, momentum, l.bias_updates, 1);
 
-    axpy_cpu(size, -decay*batch, l.filters, 1, l.filter_updates, 1);
-    axpy_cpu(size, learning_rate/batch, l.filter_updates, 1, l.filters, 1);
+    fltaddmul(l.filter_updates, l.filters, size, -decay * batch);
+    fltaddmul(l.filters, l.filter_updates, size, learning_rate / batch);
     scal_cpu(size, momentum, l.filter_updates, 1);
 }
 

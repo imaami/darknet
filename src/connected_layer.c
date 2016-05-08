@@ -92,23 +92,39 @@ layer_t make_connected_layer(int batch, int inputs, int outputs, ACTIVATION acti
 
 void update_connected_layer(layer_t l, int batch, float learning_rate, float momentum, float decay)
 {
-    axpy_cpu(l.outputs, learning_rate/batch, l.bias_updates, 1, l.biases, 1);
+    fltaddmul(l.biases, l.bias_updates, l.outputs, learning_rate / batch);
     scal_cpu(l.outputs, momentum, l.bias_updates, 1);
 
     if(l.batch_normalize){
-        axpy_cpu(l.outputs, learning_rate/batch, l.scale_updates, 1, l.scales, 1);
+        fltaddmul(l.scales, l.scale_updates, l.outputs, learning_rate / batch);
         scal_cpu(l.outputs, momentum, l.scale_updates, 1);
     }
 
-    axpy_cpu(l.inputs*l.outputs, -decay*batch, l.weights, 1, l.weight_updates, 1);
-    axpy_cpu(l.inputs*l.outputs, learning_rate/batch, l.weight_updates, 1, l.weights, 1);
+    fltaddmul(l.weight_updates, l.weights, l.inputs * l.outputs, -decay * batch);
+    fltaddmul(l.weights, l.weight_updates, l.inputs * l.outputs, learning_rate / batch);
     scal_cpu(l.inputs*l.outputs, momentum, l.weight_updates, 1);
+}
+
+__attribute__((always_inline))
+static inline void connected_layer_mean (layer_t *l)
+{
+	size_t b = l->batch, n = l->outputs;
+	float *src = l->output, *mean = l->mean, scale = 1.0f / b;
+
+	for (size_t i = 0; i < n; ++i) {
+		mean[i] = 0.0f;
+		for (size_t j = 0; j < b; ++j) {
+			size_t idx = (j * n) + i;
+			mean[i] += src[idx];
+		}
+		mean[i] *= scale;
+	}
 }
 
 void forward_connected_layer(layer_t l, network_state state)
 {
     int i;
-    fill_cpu(l.outputs*l.batch, 0, l.output, 1);
+    memset(l.output, 0, sizeof(float) * l.outputs * l.batch);
     int m = l.batch;
     int k = l.inputs;
     int n = l.outputs;
@@ -118,24 +134,24 @@ void forward_connected_layer(layer_t l, network_state state)
     gemm(0,1,m,n,k,1,a,k,b,k,1,c,n);
     if(l.batch_normalize){
         if(state.train){
-            mean_cpu(l.output, l.batch, l.outputs, 1, l.mean);
+            connected_layer_mean(&l);
             variance_cpu(l.output, l.mean, l.batch, l.outputs, 1, l.variance);
 
             scal_cpu(l.outputs, .95, l.rolling_mean, 1);
-            axpy_cpu(l.outputs, .05, l.mean, 1, l.rolling_mean, 1);
+            fltaddmul(l.rolling_mean, l.mean, l.outputs, .05);
             scal_cpu(l.outputs, .95, l.rolling_variance, 1);
-            axpy_cpu(l.outputs, .05, l.variance, 1, l.rolling_variance, 1);
+            fltaddmul(l.rolling_variance, l.variance, l.outputs, .05);
 
-            copy_cpu(l.outputs*l.batch, l.output, 1, l.x, 1);
+            fltcpy(l.x, l.output, l.outputs * l.batch);
             normalize_cpu(l.output, l.mean, l.variance, l.batch, l.outputs, 1);   
-            copy_cpu(l.outputs*l.batch, l.output, 1, l.x_norm, 1);
+            fltcpy(l.x_norm, l.output, l.outputs * l.batch);
         } else {
             normalize_cpu(l.output, l.rolling_mean, l.rolling_variance, l.batch, l.outputs, 1);
         }
         scale_bias(l.output, l.scales, l.batch, l.outputs, 1);
     }
     for(i = 0; i < l.batch; ++i){
-        axpy_cpu(l.outputs, 1, l.biases, 1, l.output + i*l.outputs, 1);
+        fltadd(l.output + i * l.outputs, l.biases, l.outputs);
     }
     activate_array(l.output, l.outputs*l.batch, l.activation);
 }
@@ -145,7 +161,7 @@ void backward_connected_layer(layer_t l, network_state state)
     int i;
     gradient_array(l.output, l.outputs*l.batch, l.activation, l.delta);
     for(i = 0; i < l.batch; ++i){
-        axpy_cpu(l.outputs, 1, l.delta + i*l.outputs, 1, l.bias_updates, 1);
+        fltadd(l.bias_updates, l.delta + i * l.outputs, l.outputs);
     }
     if(l.batch_normalize){
         backward_scale_cpu(l.x_norm, l.delta, l.batch, l.outputs, 1, l.scale_updates);
