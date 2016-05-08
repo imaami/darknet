@@ -46,7 +46,7 @@ float_pair get_rnn_data(unsigned char *text, int characters, int len, int batch,
     return p;
 }
 
-void train_char_rnn(char *cfgfile, char *weightfile, char *filename)
+static void train_char_rnn(char *cfgfile, char *weightfile, char *filename, char *outdir)
 {
     FILE *fp = fopen(filename, "rb");
 
@@ -58,7 +58,6 @@ void train_char_rnn(char *cfgfile, char *weightfile, char *filename)
     fread(text, 1, size, fp);
     fclose(fp);
 
-    char *backup_directory = "/home/pjreddie/backup/";
     srand(time(0));
     data_seed = time(0);
     char *base = basecfg(cfgfile);
@@ -92,13 +91,13 @@ void train_char_rnn(char *cfgfile, char *weightfile, char *filename)
 
         fprintf(stderr, "%d: %f, %f avg, %f rate, %lf seconds\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time));
         if(i%100==0){
-            sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
+            sprintf(buff, "%s/%s_%d.weights", outdir, base, i);
             save_weights(net, buff);
         }
-        sprintf(buff, "%s/%s.backup", backup_directory, base);
+        sprintf(buff, "%s/%s.backup", outdir, base);
         save_weights(net, buff);
     }
-    sprintf(buff, "%s/%s_final.weights", backup_directory, base);
+    sprintf(buff, "%s/%s_final.weights", outdir, base);
     save_weights(net, buff);
 }
 
@@ -181,6 +180,7 @@ void run_char_rnn(int argc, char **argv)
         return;
     }
     char *filename = find_char_arg(argc, argv, "-file", "data/shakespeare.txt");
+    char *outdir = find_char_arg(argc, argv, "-outdir", ".");
     char *seed = find_char_arg(argc, argv, "-seed", "\n");
     int len = find_int_arg(argc, argv, "-len", 1000);
     float temp = find_float_arg(argc, argv, "-temp", .7);
@@ -188,7 +188,7 @@ void run_char_rnn(int argc, char **argv)
 
     char *cfg = argv[3];
     char *weights = (argc > 4) ? argv[4] : 0;
-    if(0==strcmp(argv[2], "train")) train_char_rnn(cfg, weights, filename);
+    if(0==strcmp(argv[2], "train")) train_char_rnn(cfg, weights, filename, outdir);
     else if(0==strcmp(argv[2], "valid")) valid_char_rnn(cfg, weights);
     else if(0==strcmp(argv[2], "generate")) test_char_rnn(cfg, weights, len, seed, temp, rseed);
 }
