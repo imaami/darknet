@@ -546,9 +546,11 @@ static inline float _mm256_extract_float32(__m256 a, const int index) {
 #include <smmintrin.h>
 #include <cpuid.h>
 
+#if !defined(__clang__) || (__clang_major__ < 10)
 static inline float _castu32_f32(uint32_t a) {
     return *((float *)&a);
 }
+#endif
 
 static inline float _mm256_extract_float32(__m256 a, const int index) {
     switch(index) {
