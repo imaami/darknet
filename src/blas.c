@@ -76,6 +76,7 @@ static float relu(float src) {
 
 void shortcut_multilayer_cpu(int size, int src_outputs, int batch, int n, int *outputs_of_layers, float **layers_output, float *out, float *in, float *weights, int nweights, WEIGHTS_NORMALIZATION_T weights_normalization)
 {
+    (void)batch;
     // nweights - l.n or l.n*l.c or (l.n*l.c*l.h*l.w)
     const int layer_step = nweights / (n + 1);    // 1 or l.c or (l.c * l.h * l.w)
     int step = 0;
@@ -145,6 +146,7 @@ void shortcut_multilayer_cpu(int size, int src_outputs, int batch, int n, int *o
 void backward_shortcut_multilayer_cpu(int size, int src_outputs, int batch, int n, int *outputs_of_layers,
     float **layers_delta, float *delta_out, float *delta_in, float *weights, float *weight_updates, int nweights, float *in, float **layers_output, WEIGHTS_NORMALIZATION_T weights_normalization)
 {
+    (void)batch;
     // nweights - l.n or l.n*l.c or (l.n*l.c*l.h*l.w)
     const int layer_step = nweights / (n + 1);    // 1 or l.c or (l.c * l.h * l.w)
     int step = 0;
@@ -204,7 +206,6 @@ void backward_shortcut_multilayer_cpu(int size, int src_outputs, int batch, int 
             int add_outputs = outputs_of_layers[i];
             if (src_i < add_outputs) {
                 int add_index = add_outputs*src_b + src_i;
-                int out_index = id;
 
                 float *layer_delta = layers_delta[i];
                 if (weights) {
@@ -551,6 +552,7 @@ float cosine_similarity(float *A, float *B, unsigned int feature_size)
 // num_of_samples = 2 * loaded_images = mini_batch_size
 float P_constrastive(int i, int l, int *labels, int num_of_samples, float **z, unsigned int feature_size, float temperature, float *cos_sim)
 {
+    (void)labels;
     if (i == l) {
         fprintf(stderr, " Error: in P_constrastive must be i != l, while i = %d, l = %d \n", i, l);
         getchar();

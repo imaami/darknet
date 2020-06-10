@@ -694,7 +694,7 @@ void visualize_network(network net)
         sprintf(buff, "Layer %d", i);
         layer l = net.layers[i];
         if(l.type == CONVOLUTIONAL){
-            prev = visualize_convolutional_layer(l, buff, prev);
+            prev = visualize_convolutional_layer(l, buff);
         }
     }
 }
@@ -807,6 +807,7 @@ detection *make_network_boxes_batch(network *net, float thresh, int *num, int ba
 
 void custom_get_region_detections(layer l, int w, int h, int net_w, int net_h, float thresh, int *map, float hier, int relative, detection *dets, int letter)
 {
+    (void)hier;
     box* boxes = (box*)xcalloc(l.w * l.h * l.n, sizeof(box));
     float** probs = (float**)xcalloc(l.w * l.h * l.n, sizeof(float*));
     int i, j;
@@ -1286,7 +1287,10 @@ void fuse_conv_batchnorm(network net)
     }
 }
 
-void forward_blank_layer(layer l, network_state state) {}
+void forward_blank_layer(layer l, network_state state)
+{
+    (void)l; (void)state;
+}
 
 void calculate_binary_weights(network net)
 {

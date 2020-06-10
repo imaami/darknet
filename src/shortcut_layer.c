@@ -52,7 +52,7 @@ layer make_shortcut_layer(int batch, int n, int *input_layers, int* input_sizes,
 
     if (l.nweights > 0) {
         l.weights = (float*)calloc(l.nweights, sizeof(float));
-        float scale = sqrt(2. / l.nweights);
+        //float scale = sqrt(2. / l.nweights);
         for (i = 0; i < l.nweights; ++i) l.weights[i] = 1;// +0.01*rand_uniform(-1, 1);// scale*rand_uniform(-1, 1);   // rand_normal();
 
         if (train) l.weight_updates = (float*)calloc(l.nweights, sizeof(float));
@@ -63,9 +63,9 @@ layer make_shortcut_layer(int batch, int n, int *input_layers, int* input_sizes,
     l.backward = backward_shortcut_layer;
 #ifndef GPU
     if (l.activation == SWISH || l.activation == MISH) l.activation_input = (float*)calloc(l.batch*l.outputs, sizeof(float));
-#endif // GPU
-
-#ifdef GPU
+    (void)layers_output_gpu;
+    (void)layers_delta_gpu;
+#else // GPU
     if (l.activation == SWISH || l.activation == MISH) l.activation_input_gpu = cuda_make_array(l.activation_input, l.batch*l.outputs);
 
     l.forward_gpu = forward_shortcut_layer_gpu;
@@ -242,6 +242,7 @@ void backward_shortcut_layer_gpu(const layer l, network_state state)
 
 void update_shortcut_layer_gpu(layer l, int batch, float learning_rate_init, float momentum, float decay, float loss_scale)
 {
+    (void)decay;
     if (l.nweights > 0) {
         float learning_rate = learning_rate_init*l.learning_rate_scale;
         //float momentum = a.momentum;

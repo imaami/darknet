@@ -1268,7 +1268,7 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int c, int bo
                 const int bot_shift = min_val_cmp(h - cut_y[i], max_val_cmp(0, (-pbot*h / oh)));
 
 
-                int k, x, y;
+                int k, y;
                 for (k = 0; k < c; ++k) {
                     for (y = 0; y < h; ++y) {
                         int j = y*w + k*w*h;
@@ -1349,6 +1349,7 @@ void blend_images(image new_img, float alpha, image old_img, float beta)
 data load_data_detection(int n, char **paths, int m, int w, int h, int c, int boxes, int classes, int use_flip, int gaussian_noise, int use_blur, int use_mixup,
     float jitter, float resize, float hue, float saturation, float exposure, int mini_batch, int track, int augment_speed, int letter_box, int mosaic_bound, int show_imgs)
 {
+    (void)gaussian_noise; (void)use_blur; (void)mosaic_bound;
     const int random_index = random_gen();
     c = c ? c : 3;
     char **random_paths;
@@ -1783,6 +1784,7 @@ data load_data_super(char **paths, int n, int m, int w, int h, int scale)
 data load_data_augment(char **paths, int n, int m, char **labels, int k, tree *hierarchy, int use_flip, int min, int max, int w, int h, float angle,
     float aspect, float hue, float saturation, float exposure, int use_mixup, int use_blur, int show_imgs, float label_smooth_eps, int dontuse_opencv, int contrastive)
 {
+    (void)use_blur;
     char **paths_stored = paths;
     if(m) paths = get_random_paths(paths, n, m);
     data d = {0};

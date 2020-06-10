@@ -361,7 +361,6 @@ float train_network_datum_gpu(network net, float *x, float *y)
         float scale = (get_current_iteration(net) / ((float)net.max_batches));
         //scale = sin(scale * M_PI);
         net.learning_rate = net.adversarial_lr * scale;
-        layer l = net.layers[net.n - 1];
         int y_size = get_network_output_size(net)*net.batch;
         if (net.layers[net.n - 1].truths) y_size = net.layers[net.n - 1].truths*net.batch;
         float *truth_cpu = (float *)xcalloc(y_size, sizeof(float));
@@ -370,11 +369,11 @@ float train_network_datum_gpu(network net, float *x, float *y)
 
         forward_backward_network_gpu(net, x, truth_cpu);
 
-        image im;
-        im.w = net.w;
-        im.h = net.h;
-        im.c = net.c;
-        im.data = x;
+        //image im;
+        //im.w = net.w;
+        //im.h = net.h;
+        //im.c = net.c;
+        //im.data = x;
         //show_image(im, "adversarial data augmentation");
 
         free(truth_cpu);
@@ -384,7 +383,7 @@ float train_network_datum_gpu(network net, float *x, float *y)
     forward_backward_network_gpu(net, x, y);
     float error = get_network_cost(net);
     //if (((*net.seen) / net.batch) % net.subdivisions == 0) update_network_gpu(net);
-    const int sequence = get_sequence_value(net);
+    //const int sequence = get_sequence_value(net);
     //if (((*net.seen) / net.batch) % (net.subdivisions*sequence) == 0) update_network_gpu(net);
 
     return error;

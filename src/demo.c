@@ -56,6 +56,7 @@ static volatile int run_detect_in_thread = 0;
 
 void *fetch_in_thread(void *ptr)
 {
+    (void)ptr;
     while (!custom_atomic_load_int(&flag_exit)) {
         while (!custom_atomic_load_int(&run_fetch_in_thread)) {
             if (custom_atomic_load_int(&flag_exit)) return 0;
@@ -80,7 +81,7 @@ void *fetch_in_thread(void *ptr)
     return 0;
 }
 
-void *fetch_in_thread_sync(void *ptr)
+void *fetch_in_thread_sync(void)
 {
     custom_atomic_store_int(&run_fetch_in_thread, 1);
     while (custom_atomic_load_int(&run_fetch_in_thread)) this_thread_sleep_for(thread_wait_ms);
@@ -89,15 +90,15 @@ void *fetch_in_thread_sync(void *ptr)
 
 void *detect_in_thread(void *ptr)
 {
+    (void)ptr;
     while (!custom_atomic_load_int(&flag_exit)) {
         while (!custom_atomic_load_int(&run_detect_in_thread)) {
             if (custom_atomic_load_int(&flag_exit)) return 0;
             this_thread_yield();
         }
 
-        layer l = net.layers[net.n - 1];
         float *X = det_s.data;
-        float *prediction = network_predict(net, X);
+        network_predict(net, X);
 
         cv_images[demo_index] = det_img;
         det_img = cv_images[(demo_index + avg_frames / 2 + 1) % avg_frames];
@@ -114,7 +115,7 @@ void *detect_in_thread(void *ptr)
     return 0;
 }
 
-void *detect_in_thread_sync(void *ptr)
+void *detect_in_thread_sync(void)
 {
     custom_atomic_store_int(&run_detect_in_thread, 1);
     while (custom_atomic_load_int(&run_detect_in_thread)) this_thread_sleep_for(thread_wait_ms);
@@ -134,6 +135,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int dontdraw_bbox, int json_port, int dont_show, int ext_output, int letter_box_in, int time_limit_sec, char *http_post_host,
     int benchmark, int benchmark_layers)
 {
+    (void)hier_thresh;
     if (avgframes < 1) avgframes = 1;
     avg_frames = avgframes;
     letter_box = letter_box_in;
@@ -196,19 +198,19 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     if (custom_create_thread(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
     if (custom_create_thread(&detect_thread, 0, detect_in_thread, 0)) error("Thread creation failed");
 
-    fetch_in_thread_sync(0); //fetch_in_thread(0);
+    fetch_in_thread_sync();
     det_img = in_img;
     det_s = in_s;
 
-    fetch_in_thread_sync(0); //fetch_in_thread(0);
-    detect_in_thread_sync(0); //fetch_in_thread(0);
+    fetch_in_thread_sync();
+    detect_in_thread_sync();
     det_img = in_img;
     det_s = in_s;
 
     for (j = 0; j < avg_frames / 2; ++j) {
         free_detections(dets, nboxes);
-        fetch_in_thread_sync(0); //fetch_in_thread(0);
-        detect_in_thread_sync(0); //fetch_in_thread(0);
+        fetch_in_thread_sync();
+        detect_in_thread_sync();
         det_img = in_img;
         det_s = in_s;
     }

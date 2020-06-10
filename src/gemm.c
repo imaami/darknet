@@ -29,6 +29,7 @@ void gemm_bin(int M, int N, int K, float ALPHA,
         float *B, int ldb,
         float *C, int ldc)
 {
+    (void)ALPHA;
     int i,j,k;
     for(i = 0; i < M; ++i){
         for(k = 0; k < K; ++k){
@@ -435,6 +436,7 @@ unsigned char reverse_byte_3(unsigned char n) {
 
 void transpose8rS32_reversed_diagonale(unsigned char* A, unsigned char* B, int m, int n)
 {
+    (void)A; (void)B; (void)m;
     unsigned x, y, t;
 
     x = y = 0;
@@ -485,6 +487,7 @@ void transpose_bin(char *A, char *B, const int n, const int m,
 void transpose_bin(uint32_t *A, uint32_t *B, const int n, const int m,
     const int lda, const int ldb, const int block_size)
 {
+    (void)block_size;
     //printf("\n n = %d (n mod 32 = %d), m = %d (m mod 32 = %d) \n", n, n % 32, m, m % 32);
     //printf("\n lda = %d (lda mod 32 = %d), ldb = %d (ldb mod 32 = %d) \n", lda, lda % 32, ldb, ldb % 32);
     int i;
@@ -905,6 +908,7 @@ void gemm_nn_bin_32bit_packed(int M, int N, int K, float ALPHA,
     uint32_t *B, int ldb,
     float *C, int ldc, float *mean_arr)
 {
+    (void)ALPHA;
     int i;
     #pragma omp parallel for
     for (i = 0; i < M; ++i) {   // l.n
@@ -963,6 +967,7 @@ void gemm_nn_bin_32bit_packed(int M, int N, int K, float ALPHA,
 void convolution_2d_old(int w, int h, int ksize, int n, int c, int pad, int stride,
     float *weights, float *input, float *output)
 {
+    (void)stride;
     //const int out_h = (h + 2 * pad - ksize) / stride + 1;    // output_height=input_height for stride=1 and pad=1
     //const int out_w = (w + 2 * pad - ksize) / stride + 1;    // output_width=input_width for stride=1 and pad=1
 
@@ -1011,6 +1016,7 @@ void convolution_2d_old(int w, int h, int ksize, int n, int c, int pad, int stri
 void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
     float *weights, float *input, float *output, float *mean)
 {
+    (void)stride;
     //const int out_h = (h + 2 * pad - ksize) / stride + 1;    // output_height=input_height for stride=1 and pad=1
     //const int out_w = (w + 2 * pad - ksize) / stride + 1;    // output_width=input_width for stride=1 and pad=1
     int i;
@@ -1037,13 +1043,12 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
 
     //__m256i all256_last_zero = _mm256_set1_epi32(0xFFFFFFFF);
     //all256_last_zero.m256i_i32[7] = 0;
-    __m256i all256_last_zero =
-        _mm256_set_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x0);
+    //__m256i all256_last_zero =
+    //    _mm256_set_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x0);
 
-    __m256i idx256 = _mm256_set_epi32(0, 7, 6, 5, 4, 3, 2, 1);
+    //__m256i idx256 = _mm256_set_epi32(0, 7, 6, 5, 4, 3, 2, 1);
     //__m256 all256_sing1 = _mm256_set1_ps(0x80000000);
-    __m256 all256_one = _mm256_set1_ps(1);
-    __m256i all256i_one = _mm256_set1_epi32(1);
+    //__m256i all256i_one = _mm256_set1_epi32(1);
 
     ///__m256i src256 = _mm256_loadu_si256((__m256i *)(&src[i]));
     ///__m256i result256 = _mm256_and_si256(src256, all256_sing1); // check sign in 8 x 32-bit floats
@@ -1063,7 +1068,7 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
                 for (x = 0; x < w-8; x+=8)
                 {
                     int const output_index = fil*w*h + y*w + x;
-                    float sum = 0;
+                    //float sum = 0;
                     __m256 sum256 = _mm256_set1_ps(0);
 
                     for (chan = 0; chan < c; ++chan) {
@@ -1207,6 +1212,7 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
     unsigned char *B, int ldb,
     float *C, int ldc, float *mean_arr)
 {
+    (void)ALPHA_UNUSED;
     int i;
 
 #if defined(_OPENMP)
@@ -1641,7 +1647,7 @@ void im2col_cpu_custom_bin(float* data_im,
     // optimized version
     if (height_col == height && width_col == width && stride == 1 && pad == 1 && is_fma_avx2())
     {
-        __m256i all256_sing1 = _mm256_set_epi32(0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000);
+        //__m256i all256_sing1 = _mm256_set_epi32(0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000);
         __m256 float_zero256 = _mm256_set1_ps(0.00);
 
         int new_ldb = bit_align;
@@ -2505,6 +2511,7 @@ void gemm_nn_bin_transposed_32bit_packed(int M, int N, int K, float ALPHA,
     uint32_t *B, int ldb,
     float *C, int ldc, float *mean_arr)
 {
+    (void)ALPHA;
     int i;
     #pragma omp parallel for
     for (i = 0; i < M; ++i) {   // l.n

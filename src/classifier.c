@@ -142,7 +142,6 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
     int iter_topk = get_current_batch(net);
     float topk = 0;
 
-    int count = 0;
     double start, time_remaining, avg_time = -1, alpha_time = 0.01;
     start = what_time_is_it_now();
 
@@ -844,7 +843,6 @@ void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *fi
 
     int i = 0;
     char **names = get_labels(name_list);
-    clock_t time;
     int* indexes = (int*)xcalloc(top, sizeof(int));
     char buff[256];
     char *input = buff;
@@ -1148,7 +1146,9 @@ void threat_classifier(char *datacfg, char *cfgfile, char *weightfile, int cam_i
 
 void gun_classifier(char *datacfg, char *cfgfile, char *weightfile, int cam_index, const char *filename)
 {
-#ifdef OPENCV_DISABLE
+#ifndef OPENCV_DISABLE
+    (void)datacfg; (void)cfgfile; (void)weightfile; (void)cam_index; (void)filename;
+#else
     int bad_cats[] = {218, 539, 540, 1213, 1501, 1742, 1911, 2415, 4348, 19223, 368, 369, 370, 1133, 1200, 1306, 2122, 2301, 2537, 2823, 3179, 3596, 3639, 4489, 5107, 5140, 5289, 6240, 6631, 6762, 7048, 7171, 7969, 7984, 7989, 8824, 8927, 9915, 10270, 10448, 13401, 15205, 18358, 18894, 18895, 19249, 19697};
 
     printf("Classifier Demo\n");
@@ -1274,7 +1274,7 @@ void demo_classifier(char *datacfg, char *cfgfile, char *weightfile, int cam_ind
     int frame_counter = 0;
 
     while(1){
-        struct timeval tval_before, tval_after, tval_result;
+        struct timeval tval_before;
         gettimeofday(&tval_before, NULL);
 
         //image in = get_image_from_stream(cap);
