@@ -51,7 +51,7 @@ while (( $# )); do
     case "${BASH_REMATCH[1]}" in
     'quiet') verbose='OFF' ;;
     'verbose') verbose='ON' ;;
-    *) build_type="$arg" ;;
+    *) build_type="${BASH_REMATCH[1]}" ;;
     esac
 
   # Compiler selection accepts an optional version argument
