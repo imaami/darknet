@@ -15,12 +15,18 @@ char *get_activation_string(ACTIVATION a)
             return "loggy";
         case RELU:
             return "relu";
+        case RELU6:
+            return "relu6";
         case ELU:
             return "elu";
         case SELU:
             return "selu";
         case GELU:
             return "gelu";
+        case SWISH:
+            return "swish";
+        case MISH:
+            return "mish";
         case RELIE:
             return "relie";
         case RAMP:
@@ -39,10 +45,17 @@ char *get_activation_string(ACTIVATION a)
             return "hardtan";
         case LHTAN:
             return "lhtan";
+        case NORM_CHAN:
+            return "normalize_channels";
+        case NORM_CHAN_SOFTMAX:
+            return "normalize_channels_softmax";
+        case NORM_CHAN_SOFTMAX_MAXVAL:
+            return "normalize_channels_softmax_maxval";
         default:
+            fprintf(stderr, "%s: Invalid activation function enum %d\n", __func__, a);
             break;
     }
-    return "relu";
+    return NULL;
 }
 
 ACTIVATION get_activation(char *s)
@@ -83,6 +96,8 @@ float activate(float x, ACTIVATION a)
             return loggy_activate(x);
         case RELU:
             return relu_activate(x);
+        case RELU6:
+            return relu6_activate(x);
         case ELU:
             return elu_activate(x);
         case SELU:
@@ -105,6 +120,8 @@ float activate(float x, ACTIVATION a)
             return hardtan_activate(x);
         case LHTAN:
             return lhtan_activate(x);
+        default:
+            break;
     }
     return 0;
 }
@@ -325,6 +342,8 @@ float gradient(float x, ACTIVATION a)
             return hardtan_gradient(x);
         case LHTAN:
             return lhtan_gradient(x);
+        default:
+            break;
     }
     return 0;
 }
