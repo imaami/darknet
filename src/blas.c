@@ -587,7 +587,7 @@ void grad_contrastive_loss_positive(int i, int *labels, int num_of_samples, floa
         if (labels[i] == labels[j]) N++;
     }
     if (N == 0 || temperature == 0 || vec_len == 0) {
-        fprintf(stderr, " Error: N == 0 || temperature == 0 || vec_len == 0. N=%f, temperature=%f, vec_len=%f \n", N, temperature, vec_len);
+        fprintf(stderr, " Error: N == 0 || temperature == 0 || vec_len == 0. N=%d, temperature=%f, vec_len=%f \n", N, temperature, vec_len);
         getchar();
     }
     const float mult = 1 / ((N - 1) * temperature * vec_len);
@@ -624,7 +624,7 @@ void grad_contrastive_loss_negative(int i, int *labels, int num_of_samples, floa
         if (labels[i] == labels[j]) N++;
     }
     if (N == 0 || temperature == 0 || vec_len == 0) {
-        fprintf(stderr, " Error: N == 0 || temperature == 0 || vec_len == 0. N=%f, temperature=%f, vec_len=%f \n", N, temperature, vec_len);
+        fprintf(stderr, " Error: N == 0 || temperature == 0 || vec_len == 0. N=%d, temperature=%f, vec_len=%f \n", N, temperature, vec_len);
         getchar();
     }
     const float mult = 1 / ((N - 1) * temperature * vec_len);
