@@ -627,7 +627,8 @@ int send_http_post_request(char *http_post_host, int server_port, const char *vi
         http_post_host_str = http_post_host_str.substr(0, slash_index);
 
         // send HTTP-Post request
-        httplib::Client cli(http_post_host_str.c_str(), server_port, timeout);
+        httplib::Client cli(http_post_host_str.c_str(), server_port);
+        cli.set_connection_timeout(timeout);
         auto res = cli.Post(http_path.c_str(), message, "text/plain");
 
         return 1;
