@@ -1,5 +1,6 @@
-#define _XOPEN_SOURCE
-#include "image.h"
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include "http_stream.h"
 
 //
@@ -70,7 +71,9 @@ static int close_socket(SOCKET s) {
 #define SOCKADDR    struct sockaddr
 #define SOCKADDR_IN  struct sockaddr_in
 #define ADDRPOINTER  unsigned int*
+#ifndef OPENCV
 #define INVALID_SOCKET -1
+#endif
 #define SOCKET_ERROR   -1
 struct _IGNORE_PIPE_SIGNAL
 {
@@ -96,6 +99,10 @@ static int close_socket(SOCKET s) {
 }
 #endif // _WIN32
 
+#ifdef OPENCV
+//#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include "httplib.h"
+#endif
 
 class JSON_sender
 {
@@ -567,17 +574,6 @@ int send_http_post_request(char *http_post_host, int server_port, const char *vi
     return 0;
 }
 #else   //  __CYGWIN__
-
-#ifndef   NI_MAXHOST
-#define   NI_MAXHOST 1025
-#endif
-
-#ifndef   NI_NUMERICHOST
-#define NI_NUMERICHOST  0x02
-#endif
-
-//#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include "httplib.h"
 
 // https://webhook.site/
 // https://github.com/yhirose/cpp-httplib
