@@ -175,6 +175,8 @@ size_t get_workspace_size16(layer l) {
         if (s > most && l.train) most = s;
         return most;
     }
+#else
+    (void)l;
 #endif
     return 0;
     //if (l.xnor) return (size_t)l.bit_align*l.size*l.size*l.c * sizeof(float);
@@ -756,8 +758,10 @@ void test_convolutional_layer()
 void resize_convolutional_layer(convolutional_layer *l, int w, int h)
 {
     int total_batch = l->batch*l->steps;
+#ifdef GPU
     int old_w = l->w;
     int old_h = l->h;
+#endif
     l->w = w;
     l->h = h;
     int out_w = convolutional_out_width(*l);
@@ -846,7 +850,9 @@ void resize_convolutional_layer(convolutional_layer *l, int w, int h)
 
 void set_specified_workspace_limit(convolutional_layer *l, size_t workspace_size_limit)
 {
-#ifdef CUDNN
+#ifndef CUDNN
+    (void)l; (void)workspace_size_limit;
+#else
     size_t free_byte;
     size_t total_byte;
     CHECK_CUDA(cudaMemGetInfo(&free_byte, &total_byte));
@@ -1201,7 +1207,7 @@ void forward_convolutional_layer(convolutional_layer l, network_state state)
                         //size_t ldb_align = 256; // 256 bit for AVX2
                         int ldb_align = l.lda_align;
                         size_t new_ldb = k + (ldb_align - k%ldb_align);
-                        size_t t_intput_size = binary_transpose_align_input(k, n, state.workspace, &l.t_bit_input, ldb_align, l.bit_align);
+                        binary_transpose_align_input(k, n, state.workspace, &l.t_bit_input, ldb_align, l.bit_align);
 
                         // 5x times faster than gemm()-float32
                         gemm_nn_custom_bin_mean_transposed(m, n, k, 1, (unsigned char*)l.align_bit_weights, new_ldb, (unsigned char*)l.t_bit_input, new_ldb, c, n, l.mean_arr);
@@ -1272,7 +1278,7 @@ void forward_convolutional_layer(convolutional_layer l, network_state state)
 
     if(l.binary || l.xnor) swap_binary(&l);
 
-    //visualize_convolutional_layer(l, "conv_visual", NULL);
+    //visualize_convolutional_layer(l, "conv_visual");
     //wait_until_press_key_cv();
 
     if(l.assisted_excitation && state.train) assisted_excitation_forward(l, state);
@@ -1533,7 +1539,7 @@ image *get_weights(convolutional_layer l)
     return weights;
 }
 
-image *visualize_convolutional_layer(convolutional_layer l, char *window, image *prev_weights)
+image *visualize_convolutional_layer(convolutional_layer l, char *window)
 {
     image *single_weights = get_weights(l);
     show_images(single_weights, l.n, window);

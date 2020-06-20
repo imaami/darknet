@@ -864,7 +864,7 @@ extern "C" void save_cv_jpg(mat_cv *img_src, const char *name)
 // ====================================================================
 // Draw Detection
 // ====================================================================
-extern "C" void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output)
+extern "C" void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, float thresh, char **names, image **, int classes, int ext_output)
 {
     try {
         cv::Mat *show_img = (cv::Mat*)mat;
@@ -1314,7 +1314,7 @@ std::atomic<int> x_end, y_end;
 std::atomic<int> x_size, y_size;
 std::atomic<bool> draw_select, selected;
 
-void callback_mouse_click(int event, int x, int y, int flags, void* user_data)
+void callback_mouse_click(int event, int x, int y, int, void*)
 {
     if (event == cv::EVENT_LBUTTONDOWN)
     {
@@ -1347,7 +1347,7 @@ void callback_mouse_click(int event, int x, int y, int flags, void* user_data)
     }
 }
 
-extern "C" void cv_draw_object(image sized, float *truth_cpu, int max_boxes, int num_truth, int *it_num_set, float *lr_set, int *boxonly, int classes, char **names)
+extern "C" void cv_draw_object(image sized, float *truth_cpu, int, int, int *it_num_set, float *lr_set, int *boxonly, int classes, char **names)
 {
     cv::Mat frame = image_to_mat(sized);
     if(frame.channels() == 3) cv::cvtColor(frame, frame, cv::COLOR_RGB2BGR);
@@ -1364,18 +1364,18 @@ extern "C" void cv_draw_object(image sized, float *truth_cpu, int max_boxes, int
 
     int it_trackbar_value = 200;
     std::string const it_trackbar_name = "iterations";
-    int it_tb_res = cv::createTrackbar(it_trackbar_name, window_name, &it_trackbar_value, 1000);
+    cv::createTrackbar(it_trackbar_name, window_name, &it_trackbar_value, 1000);
 
     int lr_trackbar_value = 10;
     std::string const lr_trackbar_name = "learning_rate exp";
-    int lr_tb_res = cv::createTrackbar(lr_trackbar_name, window_name, &lr_trackbar_value, 20);
+    cv::createTrackbar(lr_trackbar_name, window_name, &lr_trackbar_value, 20);
 
     int cl_trackbar_value = 0;
     std::string const cl_trackbar_name = "class_id";
-    int cl_tb_res = cv::createTrackbar(cl_trackbar_name, window_name, &cl_trackbar_value, classes-1);
+    cv::createTrackbar(cl_trackbar_name, window_name, &cl_trackbar_value, classes-1);
 
     std::string const bo_trackbar_name = "box-only";
-    int bo_tb_res = cv::createTrackbar(bo_trackbar_name, window_name, boxonly, 1);
+    cv::createTrackbar(bo_trackbar_name, window_name, boxonly, 1);
 
     int i = 0;
 
@@ -1388,7 +1388,6 @@ extern "C" void cv_draw_object(image sized, float *truth_cpu, int max_boxes, int
         if (pressed_key == 27 || pressed_key == 1048603) break;// break;  // ESC - save & exit
 
         frame_clone = frame.clone();
-        char buff[100];
         std::string lr_value = "learning_rate = " + std::to_string(1.0 / pow(2, lr_trackbar_value));
         cv::putText(frame_clone, lr_value, cv::Point2i(10, 20), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(10, 50, 10), 3);
         cv::putText(frame_clone, lr_value, cv::Point2i(10, 20), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(20, 120, 60), 2);

@@ -253,7 +253,7 @@ public:
                     //"Content-Type: multipart/x-mixed-replace; boundary=boundary\r\n"
                     "\r\n", 0);
                 _write(client, "[\n", 0);   // open JSON array
-                int n = _write(client, outputbuf, outlen);
+                _write(client, outputbuf, outlen);
                 cerr << "JSON_sender: new client " << client << endl;
             }
             else // existing client, just stream pix
@@ -579,7 +579,7 @@ int send_http_post_request(char *http_post_host, int server_port, const char *vi
 // https://github.com/yhirose/cpp-httplib
 // sent POST http request
 int send_http_post_request(char *http_post_host, int server_port, const char *videosource,
-    detection *dets, int nboxes, int classes, char **names, long long int frame_id, int ext_output, int timeout)
+    detection *dets, int nboxes, int classes, char **names, long long int, int, int timeout)
 {
     const float thresh = 0.005; // function get_network_boxes() has already filtred dets by actual threshold
 
@@ -682,7 +682,7 @@ void show_total_time() {
 }
 
 
-int custom_create_thread(custom_thread_t * tid, const custom_attr_t * attr, void *(*func) (void *), void *arg)
+int custom_create_thread(custom_thread_t * tid, const custom_attr_t *, void *(*func) (void *), void *arg)
 {
     std::thread *ptr = new std::thread(func, arg);
     *tid = (custom_thread_t *)ptr;
@@ -690,7 +690,7 @@ int custom_create_thread(custom_thread_t * tid, const custom_attr_t * attr, void
     else return -1;
 }
 
-int custom_join(custom_thread_t tid, void **value_ptr)
+int custom_join(custom_thread_t tid, void **)
 {
     std::thread *ptr = (std::thread *)tid;
     if (ptr) {

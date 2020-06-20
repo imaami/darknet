@@ -1203,7 +1203,7 @@ void update_convolutional_layer_gpu(layer l, int batch, float learning_rate_init
             smooth_rotate_weights_kernel(l.weights_gpu, l.weight_deform_gpu, l.nweights, l.n, l.size, angle, 0);
 
             cuda_pull_array(l.weight_deform_gpu, l.weights, l.nweights);
-            visualize_convolutional_layer(l, "weights", NULL);
+            visualize_convolutional_layer(l, "weights");
             wait_key_cv(10);
         }
         */
@@ -1226,7 +1226,7 @@ void update_convolutional_layer_gpu(layer l, int batch, float learning_rate_init
 
             //printf(" angle = %f \n", l.angle);
             //cuda_pull_array(l.weight_deform_gpu, l.weights, l.nweights);
-            //visualize_convolutional_layer(l, "weights", NULL);
+            //visualize_convolutional_layer(l, "weights");
             //wait_key_cv(10);
         //}
 
@@ -1296,7 +1296,7 @@ void update_convolutional_layer_gpu(layer l, int batch, float learning_rate_init
 
             //printf(" angle = %f, reverse = %d \n", l.angle, 0);
             //cuda_pull_array(l.weights_gpu, l.weights, l.nweights);
-            //visualize_convolutional_layer(l, "weights", NULL);
+            //visualize_convolutional_layer(l, "weights");
             //wait_key_cv(10);
         //}
     }
