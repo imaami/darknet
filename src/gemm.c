@@ -546,9 +546,28 @@ static inline float _mm256_extract_float32(__m256 a, const int index) {
 #include <smmintrin.h>
 #include <cpuid.h>
 
+/*
+ * Upstream Clang/LLVM versions older than 10 do not have _castu_f32().
+ *
+ * Unsurprisingly, Apple's __clang_*__ macros follow an unrelated and arbitrary
+ * versioning scheme seemingly out of spite. At the moment of writing (2020-06)
+ * the latest stable Xcode release, version 11.5, is based on LLVM 9 and ships
+ * with a Clang that purports to be version 11.0.3.
+ *
+ * Beginning with Xcode 9.0, a change in any of Apple's __clang_*__ version
+ * macros has coincided with a rebase against a newer upstream LLVM. If this
+ * trend holds then AppleClang 11.0.3 is the last release based on upstream
+ * LLVM 9, and the next one will have _castu32_f32().
+ */
+#if !defined(__clang__) \
+    || (__clang_major__ < 10) \
+    || (defined(__APPLE__) && !((__clang_major__ > 11) \
+                                || (__clang_minor__ > 0) \
+                                || (__clang_patchlevel__ > 3)))
 static inline float _castu32_f32(uint32_t a) {
     return *((float *)&a);
 }
+#endif
 
 static inline float _mm256_extract_float32(__m256 a, const int index) {
     switch(index) {
