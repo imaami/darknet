@@ -86,7 +86,7 @@ void im2col_ongpu(float *im,
 }
 // --------------------------------
 
-/*
+#if 0
 __global__ void im2col_align_gpu_kernel(const int n, const float* data_im,
     const int height, const int width, const int ksize,
     const int pad,
@@ -137,7 +137,7 @@ __global__ void im2col_align_gpu_kernel(const int n, const float* data_im,
         }
     }
 }
-*/
+#endif
 
 // float 32
 __global__ void im2col_align_gpu_kernel(const int n, const float* data_im,
@@ -1148,7 +1148,7 @@ __global__ void gemm_nn_custom_bin_mean_transposed_gpu_kernel(int M, int N, int 
 }
 */
 
-/*
+#if 0
 // A (weights) in the shared_memory
 __global__ void gemm_nn_custom_bin_mean_transposed_gpu_kernel(int M, int N, int K,
     unsigned char *A, int lda,
@@ -1207,7 +1207,7 @@ __global__ void gemm_nn_custom_bin_mean_transposed_gpu_kernel(int M, int N, int 
         }
     }
 }
-*/
+#endif
 
 __inline__ __device__
 int warpAllReduceSum(int val) {
