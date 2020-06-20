@@ -83,15 +83,15 @@ jobs:
     - name: Restore from cache and run vcpkg
       env:
         vcpkgResponseFile: ${{ github.workspace }}/cmake/vcpkg_linux.diff
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v3
       with:
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-        vcpkgGitCommitId: '2bc6cd714f931c32d3299a137d5abe0f86f803e1'
+        vcpkgGitCommitId: 'ffa7fd27cfa29f206d1fd2ccfc722cad4aaeef3d'
         appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -132,7 +132,7 @@ jobs:
     - uses: lukka/get-cmake@latest
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -195,7 +195,7 @@ jobs:
         CUDA_PATH: "/usr/local/cuda-10.2"
         CUDA_TOOLKIT_ROOT_DIR: "/usr/local/cuda-10.2"
         LD_LIBRARY_PATH: "/usr/local/cuda-10.2/lib64:/usr/local/cuda-10.2/lib64/stubs:$LD_LIBRARY_PATH"
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -231,7 +231,7 @@ jobs:
     - uses: lukka/get-cmake@latest
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -255,15 +255,15 @@ jobs:
     - name: Restore from cache and run vcpkg
       env:
         vcpkgResponseFile: ${{ github.workspace }}/cmake/vcpkg_osx.diff
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v3
       with:
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-        vcpkgGitCommitId: '2bc6cd714f931c32d3299a137d5abe0f86f803e1'
+        vcpkgGitCommitId: 'ffa7fd27cfa29f206d1fd2ccfc722cad4aaeef3d'
         appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -302,7 +302,7 @@ jobs:
     - uses: lukka/get-cmake@latest
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -338,7 +338,7 @@ jobs:
     - uses: lukka/get-cmake@latest
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -359,15 +359,15 @@ jobs:
     - name: Restore from cache and run vcpkg
       env:
         vcpkgResponseFile: ${{ github.workspace }}/cmake/vcpkg_windows.diff
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v3
       with:
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-        vcpkgGitCommitId: '2bc6cd714f931c32d3299a137d5abe0f86f803e1'
+        vcpkgGitCommitId: 'ffa7fd27cfa29f206d1fd2ccfc722cad4aaeef3d'
         appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -420,11 +420,11 @@ jobs:
         CUDA_TOOLKIT_ROOT_DIR: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
         CUDACXX: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2\\bin\\nvcc.exe"
 
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v3
       with:
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-        vcpkgGitCommitId: '2bc6cd714f931c32d3299a137d5abe0f86f803e1'
+        vcpkgGitCommitId: 'ffa7fd27cfa29f206d1fd2ccfc722cad4aaeef3d'
         appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
     - name: 'Build with CMake and Ninja'
@@ -433,7 +433,7 @@ jobs:
         CUDA_PATH_V10_2: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
         CUDA_TOOLKIT_ROOT_DIR: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
         CUDACXX: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2\\bin\\nvcc.exe"
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -473,7 +473,7 @@ jobs:
     - uses: lukka/get-cmake@latest
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -513,7 +513,7 @@ jobs:
     - uses: lukka/get-cmake@latest
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -543,7 +543,7 @@ jobs:
         CUDA_PATH_V10_2: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
         CUDA_TOOLKIT_ROOT_DIR: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
         CUDACXX: "C:\\Program\ Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2\\bin\\nvcc.exe"
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
@@ -562,7 +562,7 @@ jobs:
     - uses: lukka/get-cmake@latest
 
     - name: 'Build with CMake and Ninja'
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v2.5
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
