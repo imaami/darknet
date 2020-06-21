@@ -1,0 +1,4 @@
+include
+3rdparty/stb/include
+/usr/local/cuda/targets/x86_64-linux/include
+/usr/lib/llvm-10/include/openmp
