@@ -70,18 +70,16 @@ void forward_scale_channels_layer(const layer l, network_state state)
     float *from_output = state.net.layers[l.index].output;
 
     if (l.scale_wh) {
-        int i;
         #pragma omp parallel for
-        for (i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             int input_index = i % channel_size + (i / batch_size)*channel_size;
 
             l.output[i] = state.input[input_index] * from_output[i];
         }
     }
     else {
-        int i;
         #pragma omp parallel for
-        for (i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             l.output[i] = state.input[i / channel_size] * from_output[i];
         }
     }
@@ -102,9 +100,8 @@ void backward_scale_channels_layer(const layer l, network_state state)
     float *from_delta = state.net.layers[l.index].delta;
 
     if (l.scale_wh) {
-        int i;
         #pragma omp parallel for
-        for (i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             int input_index = i % channel_size + (i / batch_size)*channel_size;
 
             state.delta[input_index] += l.delta[i] * from_output[i];// / l.out_c; // l.delta * from  (should be divided by l.out_c?)
@@ -113,9 +110,8 @@ void backward_scale_channels_layer(const layer l, network_state state)
         }
     }
     else {
-        int i;
         #pragma omp parallel for
-        for (i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             state.delta[i / channel_size] += l.delta[i] * from_output[i];// / channel_size; // l.delta * from  (should be divided by channel_size?)
 
             from_delta[i] += state.input[i / channel_size] * l.delta[i]; // input * l.delta
