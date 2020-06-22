@@ -1340,9 +1340,8 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int c, int bo
 void blend_images(image new_img, float alpha, image old_img, float beta)
 {
     int data_size = new_img.w * new_img.h * new_img.c;
-    int i;
     #pragma omp parallel for
-    for (i = 0; i < data_size; ++i)
+    for (int i = 0; i < data_size; ++i)
         new_img.data[i] = new_img.data[i] * alpha + old_img.data[i] * beta;
 }
 
