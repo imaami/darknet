@@ -2576,7 +2576,7 @@ void transpose_uint32(uint32_t *src, uint32_t *dst, int src_h, int src_w, int sr
             ((uint32_t *)dst)[j*dst_align / 32 + i] = ((uint32_t *)src)[i*src_align + j];
         }
     }
-    }
+    //}
 }
 
 void gemm_nn_bin_transposed_32bit_packed(int M, int N, int K, float ALPHA,
