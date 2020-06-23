@@ -64,9 +64,13 @@ void forward_sam_layer(const layer l, network_state state)
     //int channel_size = 1;
     float *from_output = state.net.layers[l.index].output;
 
-    #pragma omp parallel for
-    for (int i = 0; i < size; ++i) {
+    #pragma omp parallel
+    {
+    int i;
+    #pragma omp for
+    for (i = 0; i < size; ++i) {
         l.output[i] = state.input[i] * from_output[i];
+    }
     }
 
     activate_array(l.output, l.outputs*l.batch, l.activation);
@@ -83,11 +87,15 @@ void backward_sam_layer(const layer l, network_state state)
     float *from_output = state.net.layers[l.index].output;
     float *from_delta = state.net.layers[l.index].delta;
 
-    #pragma omp parallel for
-    for (int i = 0; i < size; ++i) {
+    #pragma omp parallel
+    {
+    int i;
+    #pragma omp for
+    for (i = 0; i < size; ++i) {
         state.delta[i] += l.delta[i] * from_output[i]; // l.delta * from  (should be divided by channel_size?)
 
         from_delta[i] = state.input[i] * l.delta[i]; // input * l.delta
+    }
     }
 }
 

@@ -371,9 +371,12 @@ void backward_region_layer(const region_layer l, network_state state)
 
 void get_region_boxes(layer l, int w, int h, float thresh, float **probs, box *boxes, int only_objectness, int *map)
 {
+    #pragma omp parallel
+    {
+    int i;
     float *const predictions = l.output;
-    #pragma omp parallel for
-    for (int i = 0; i < l.w*l.h; ++i){
+    #pragma omp for
+    for (i = 0; i < l.w*l.h; ++i){
         int j, n;
         int row = i / l.w;
         int col = i % l.w;
@@ -420,6 +423,7 @@ void get_region_boxes(layer l, int w, int h, float thresh, float **probs, box *b
                 probs[index][0] = scale;
             }
         }
+    }
     }
 }
 
