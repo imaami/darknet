@@ -216,9 +216,11 @@ void gemm_nn_custom_bin_mean(int M, int N, int K, float ALPHA_UNUSED,
 {
     int *count_arr = xcalloc(M*N, sizeof(int));
 
+    #pragma omp parallel
+    {
     int i;
 
-#pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < M; ++i) {   // l.n - filters [16 - 55 - 1024]
         int j, k, h;
         for (k = 0; k < K; ++k) {   // l.size*l.size*l.c - one filter size [27 - 9216]
@@ -251,10 +253,11 @@ void gemm_nn_custom_bin_mean(int M, int N, int K, float ALPHA_UNUSED,
             }
         }
     }
+    }
 
     if (mean_arr) {
         //int K_2 = K / 2;
-        for (i = 0; i < M; ++i) {
+        for (int i = 0; i < M; ++i) {
             float mean_val = mean_arr[i];
             //float mean_val2 = 2 * mean_val;
             for (j = 0; j < N; ++j) {
@@ -264,7 +267,7 @@ void gemm_nn_custom_bin_mean(int M, int N, int K, float ALPHA_UNUSED,
         }
     }
     else {
-        for (i = 0; i < M; ++i) {
+        for (int i = 0; i < M; ++i) {
             for (j = 0; j < N; ++j) {
                 C[i*ldc + j] = count_arr[i*ldc + j] - K / 2;
             }
@@ -284,9 +287,11 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
     unsigned char *B, int ldb,
     float *C, int ldc, float *mean_arr)
 {
+    #pragma omp parallel
+    {
     int i;
 
-#pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < M; ++i) {   // l.n - filters [16 - 55 - 1024]
         int j, k, h;
         float mean_val = mean_arr[i];
@@ -313,6 +318,7 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
 
             C[i*ldc + j] = (2 * count - K) * mean_val;
         }
+    }
     }
 }
 */
@@ -464,8 +470,10 @@ void transpose_bin(char *A, char *B, const int n, const int m,
     const int lda, const int ldb, const int block_size)
 {
     //printf("\n n = %d, ldb = %d \t\t m = %d, lda = %d \n", n, ldb, m, lda);
+    #pragma omp parallel
+    {
     int i;
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < n; i += 8) {
         int j;
         for (j = 0; j < m; j += 8) {
@@ -477,6 +485,7 @@ void transpose_bin(char *A, char *B, const int n, const int m,
         for (; j < m; ++j) {
             if (get_bit(A, i*lda + j)) set_bit(B, j*ldb + i);
         }
+    }
     }
 }
 */
@@ -490,8 +499,10 @@ void transpose_bin(uint32_t *A, uint32_t *B, const int n, const int m,
     (void)block_size;
     //printf("\n n = %d (n mod 32 = %d), m = %d (m mod 32 = %d) \n", n, n % 32, m, m % 32);
     //printf("\n lda = %d (lda mod 32 = %d), ldb = %d (ldb mod 32 = %d) \n", lda, lda % 32, ldb, ldb % 32);
+    #pragma omp parallel
+    {
     int i;
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < n; i += 32) {
         int j;
         for (j = 0; j < m; j += 32) {
@@ -503,6 +514,7 @@ void transpose_bin(uint32_t *A, uint32_t *B, const int n, const int m,
         for (; j < m; ++j) {
             if (get_bit((const unsigned char* const)A, i * lda + j)) set_bit((unsigned char* const)B, j * ldb + i);
         }
+    }
     }
 }
 
@@ -791,9 +803,11 @@ void gemm_nn_fast(int M, int N, int K, float ALPHA,
     float *B, int ldb,
     float *C, int ldc)
 {
+    #pragma omp parallel
+    {
     int i;
 
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < (M / TILE_M)*TILE_M; i += TILE_M)
     {
         int j, k;
@@ -908,8 +922,9 @@ void gemm_nn_fast(int M, int N, int K, float ALPHA,
             }
         }
     }
+    }
 
-    for (i = (M / TILE_M)*TILE_M; i < M; ++i) {
+    for (int i = (M / TILE_M)*TILE_M; i < M; ++i) {
         int j, k;
         for (k = 0; k < K; ++k) {
             PUT_IN_REGISTER float A_PART = ALPHA*A[i*lda + k];
@@ -928,8 +943,10 @@ void gemm_nn_bin_32bit_packed(int M, int N, int K, float ALPHA,
     float *C, int ldc, float *mean_arr)
 {
     (void)ALPHA;
+    #pragma omp parallel
+    {
     int i;
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < M; ++i) {   // l.n
         int j, s;
         float mean_val = mean_arr[i];
@@ -981,6 +998,7 @@ void gemm_nn_bin_32bit_packed(int M, int N, int K, float ALPHA,
             }
         }
     }
+    }
 }
 
 void convolution_2d_old(int w, int h, int ksize, int n, int c, int pad, int stride,
@@ -990,9 +1008,11 @@ void convolution_2d_old(int w, int h, int ksize, int n, int c, int pad, int stri
     //const int out_h = (h + 2 * pad - ksize) / stride + 1;    // output_height=input_height for stride=1 and pad=1
     //const int out_w = (w + 2 * pad - ksize) / stride + 1;    // output_width=input_width for stride=1 and pad=1
 
+    #pragma omp parallel
+    {
     int fil;
     // filter index
-    #pragma omp parallel for      // "omp parallel for" - automatic parallelization of loop by using OpenMP
+    #pragma omp for
     for (fil = 0; fil < n; ++fil) {
         //int i, f, j;
         int chan, y, x, f_y, f_x;
@@ -1029,6 +1049,7 @@ void convolution_2d_old(int w, int h, int ksize, int n, int c, int pad, int stri
                     //        l.weights[filters][channels][filter_width][filter_height];
                     output[output_index] += sum;
                 }
+    }
     }
 }
 
@@ -1072,9 +1093,11 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
     ///__m256i src256 = _mm256_loadu_si256((__m256i *)(&src[i]));
     ///__m256i result256 = _mm256_and_si256(src256, all256_sing1); // check sign in 8 x 32-bit floats
 
+    #pragma omp parallel
+    {
     int fil;
     // filter index
-    #pragma omp parallel for      // "omp parallel for" - automatic parallelization of loop by using OpenMP
+    #pragma omp for
     for (fil = 0; fil < n; ++fil) {
         int chan, y, x, f_y, f_x;
         float cur_mean = fabs(mean[fil]);
@@ -1154,6 +1177,7 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
                     //_mm256_storeu_ps(&C[i*ldc + j], result256);
                 }
     }
+    }
 }
 
 
@@ -1232,7 +1256,6 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
     float *C, int ldc, float *mean_arr)
 {
     (void)ALPHA_UNUSED;
-    int i;
 
 #if defined(_OPENMP)
     static int max_num_threads = 0;
@@ -1242,9 +1265,10 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
     }
 #endif
 
-    //#pragma omp parallel for
-    //for (i = 0; i < M; ++i)
-    #pragma omp parallel for
+    #pragma omp parallel
+    {
+    int i;
+    #pragma omp for
     for (i = 0; i < (M/2)*2; i += 2)
     {   // l.n - filters [16 - 55 - 1024]
         float mean_val_0 = mean_arr[i + 0];
@@ -1319,8 +1343,9 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
             }
         }
     }
+    }
 
-    for (i = (M / 2) * 2; i < M; i += 1)
+    for (int i = (M / 2) * 2; i < M; i += 1)
     {
         float mean_val = mean_arr[i];
         int j, k;
@@ -1354,12 +1379,14 @@ void im2col_cpu_custom_transpose(float* data_im,
     const int height_col = (height + 2 * pad - ksize) / stride + 1;
     const int width_col = (width + 2 * pad - ksize) / stride + 1;
     const int channels_col = channels * ksize * ksize;
-    int c;
 
     // optimized version
     if (height_col == height && width_col == width && stride == 1 && pad == 1)
     {
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int c;
+        #pragma omp for
         for (c = 0; c < channels_col; ++c) {
             int h, w;
             int w_offset = c % ksize;
@@ -1438,10 +1465,14 @@ void im2col_cpu_custom_transpose(float* data_im,
                 }
             }
         }
+        }
 
     }
     else {
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int c;
+        #pragma omp for
         for (c = 0; c < channels_col; ++c) {
             int h, w;
             int w_offset = c % ksize;
@@ -1458,6 +1489,7 @@ void im2col_cpu_custom_transpose(float* data_im,
                 }
             }
         }
+        }
     }
 }
 
@@ -1468,7 +1500,6 @@ void im2col_cpu_custom(float* data_im,
     int channels, int height, int width,
     int ksize, int stride, int pad, float* data_col)
 {
-    int c;
     const int height_col = (height + 2 * pad - ksize) / stride + 1;
     const int width_col = (width + 2 * pad - ksize) / stride + 1;
     const int channels_col = channels * ksize * ksize;
@@ -1476,7 +1507,10 @@ void im2col_cpu_custom(float* data_im,
     // optimized version
     if (height_col == height && width_col == width && stride == 1 && pad == 1 && is_fma_avx2())
     {
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int c;
+        #pragma omp for
         for (c = 0; c < channels_col; ++c) {
             int h, w;
             int w_offset = c % ksize;
@@ -1546,6 +1580,7 @@ void im2col_cpu_custom(float* data_im,
                 }
             }
         }
+        }
 
     }
     else {
@@ -1560,7 +1595,6 @@ void im2col_cpu_custom_align(float* data_im,
     int channels, int height, int width,
     int ksize, int stride, int pad, float* data_col, int bit_align)
 {
-    int c;
     const int height_col = (height + 2 * pad - ksize) / stride + 1;
     const int width_col = (width + 2 * pad - ksize) / stride + 1;
     const int channels_col = channels * ksize * ksize;
@@ -1570,7 +1604,10 @@ void im2col_cpu_custom_align(float* data_im,
     {
         int new_ldb = bit_align;
 
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int c;
+        #pragma omp for
         for (c = 0; c < channels_col; ++c) {
             int h, w;
             int w_offset = c % ksize;
@@ -1641,6 +1678,7 @@ void im2col_cpu_custom_align(float* data_im,
                 }
             }
         }
+        }
 
     }
     else {
@@ -1658,7 +1696,6 @@ void im2col_cpu_custom_bin(float* data_im,
     int channels, int height, int width,
     int ksize, int stride, int pad, float* data_col, int bit_align)
 {
-    int c;
     const int height_col = (height + 2 * pad - ksize) / stride + 1;
     const int width_col = (width + 2 * pad - ksize) / stride + 1;
     const int channels_col = channels * ksize * ksize;
@@ -1671,7 +1708,10 @@ void im2col_cpu_custom_bin(float* data_im,
 
         int new_ldb = bit_align;
 
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int c;
+        #pragma omp for
         for (c = 0; c < channels_col; ++c) {
             int h, w;
             int w_offset = c % ksize;
@@ -1765,6 +1805,7 @@ void im2col_cpu_custom_bin(float* data_im,
                 }
             }
         }
+        }
 
     }
     else {
@@ -1851,8 +1892,10 @@ static inline void transpose4x4_SSE(float *A, float *B, const int lda, const int
 void transpose_block_SSE4x4(float *A, float *B, const int n, const int m,
     const int lda, const int ldb, const int block_size)
 {
+    #pragma omp parallel
+    {
     int i;
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < n; i += block_size) {
         int j, i2, j2;
         //int max_i2 = (i + block_size < n) ? (i + block_size) : n;
@@ -1885,6 +1928,7 @@ void transpose_block_SSE4x4(float *A, float *B, const int n, const int m,
             }
         }
     }
+    }
 }
 
 
@@ -1894,10 +1938,13 @@ void forward_maxpool_layer_avx(float *src, float *dst, int *indexes, int size, i
 
     const int w_offset = -pad / 2;
     const int h_offset = -pad / 2;
-    int b, k;
+    int b;
 
     for (b = 0; b < batch; ++b) {
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int k;
+        #pragma omp for
         for (k = 0; k < c; ++k) {
             int i, j, m, n;
             for (i = 0; i < out_h; ++i) {
@@ -1979,6 +2026,7 @@ void forward_maxpool_layer_avx(float *src, float *dst, int *indexes, int size, i
                 }
             }
         }
+        }
     }
 }
 
@@ -2013,8 +2061,11 @@ void gemm_nn_fast(int M, int N, int K, float ALPHA,
     float *B, int ldb,
     float *C, int ldc)
 {
-    int i, j, k;
-    #pragma omp parallel for
+    int j, k;
+    #pragma omp parallel
+    {
+    int i;
+    #pragma omp for
     for (i = 0; i < M; ++i) {
         for (k = 0; k < K; ++k) {
             PUT_IN_REGISTER float A_PART = ALPHA*A[i*lda + k];
@@ -2023,6 +2074,7 @@ void gemm_nn_fast(int M, int N, int K, float ALPHA,
             }
         }
     }
+    }
 }
 
 void gemm_nn_bin_32bit_packed(int M, int N, int K, float ALPHA,
@@ -2030,8 +2082,10 @@ void gemm_nn_bin_32bit_packed(int M, int N, int K, float ALPHA,
     uint32_t *B, int ldb,
     float *C, int ldc, float *mean_arr)
 {
+    #pragma omp parallel
+    {
     int i;
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < M; ++i) {   // l.n
         int j, s;
         float mean_val = mean_arr[i];
@@ -2053,6 +2107,7 @@ void gemm_nn_bin_32bit_packed(int M, int N, int K, float ALPHA,
             }
         }
     }
+    }
 }
 
 
@@ -2063,9 +2118,11 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
     const int out_w = (w + 2 * pad - ksize) / stride + 1;    // output_width=input_width for stride=1 and pad=1
     //int i, f, j;
 
+    #pragma omp parallel
+    {
     int fil;
     // filter index
-    #pragma omp parallel for      // "omp parallel for" - automatic parallelization of loop by using OpenMP
+    #pragma omp for
     for (fil = 0; fil < n; ++fil) {
         int chan, y, x, f_y, f_x;
         // channel index
@@ -2102,6 +2159,7 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
                     output[output_index] += sum;
                 }
     }
+    }
 }
 
 static inline int popcnt_64(uint64_t val64) {
@@ -2128,9 +2186,11 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
     unsigned char *B, int ldb,
     float *C, int ldc, float *mean_arr)
 {
+    #pragma omp parallel
+    {
     int i;
 
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < M; ++i) {   // l.n - filters [16 - 55 - 1024]
         int j, k;
         float mean_val = mean_arr[i];
@@ -2154,6 +2214,7 @@ void gemm_nn_custom_bin_mean_transposed(int M, int N, int K, float ALPHA_UNUSED,
             C[i*ldc + j] = (2 * count - K) * mean_val;
         }
     }
+    }
 }
 
 void im2col_cpu_custom_transpose(float* data_im,
@@ -2172,7 +2233,6 @@ void im2col_cpu_custom(float* data_im,
     im2col_cpu(data_im, channels, height, width, ksize, stride, pad, data_col);
     return;
 
-    int c;
     const int height_col = (height + 2 * pad - ksize) / stride + 1;
     const int width_col = (width + 2 * pad - ksize) / stride + 1;
     const int channels_col = channels * ksize * ksize;
@@ -2180,7 +2240,10 @@ void im2col_cpu_custom(float* data_im,
     // optimized version
     if (height_col == height && width_col == width && stride == 1 && pad == 1)
     {
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int c;
+        #pragma omp for
         for (c = 0; c < channels_col; ++c) {
             int h, w;
             int w_offset = c % ksize;
@@ -2202,7 +2265,7 @@ void im2col_cpu_custom(float* data_im,
 
                     data_col[col_index] = data_im[im_col + width*(im_row + height*c_im)];
                 }
-    }
+            }
 
             {
                 w = 0;
@@ -2248,6 +2311,7 @@ void im2col_cpu_custom(float* data_im,
                 }
             }
         }
+        }
 
     }
     else {
@@ -2263,7 +2327,6 @@ void im2col_cpu_custom_bin(float* data_im,
     int channels, int height, int width,
     int ksize, int stride, int pad, float* data_col, int bit_align)
 {
-    int c;
     const int height_col = (height + 2 * pad - ksize) / stride + 1;
     const int width_col = (width + 2 * pad - ksize) / stride + 1;
     const int channels_col = channels * ksize * ksize;
@@ -2273,7 +2336,10 @@ void im2col_cpu_custom_bin(float* data_im,
     {
         int new_ldb = bit_align;
 
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int c;
+        #pragma omp for
         for (c = 0; c < channels_col; ++c) {
             int h, w;
             int w_offset = c % ksize;
@@ -2358,6 +2424,7 @@ void im2col_cpu_custom_bin(float* data_im,
                 }
             }
         }
+        }
 
     }
     else {
@@ -2420,21 +2487,26 @@ void float_to_bit(float *src, unsigned char *dst, size_t size)
 
 static inline void transpose_scalar_block(float *A, float *B, const int lda, const int ldb, const int block_size)
 {
+    //#pragma omp parallel
+    //{
     int i;
-    //#pragma omp parallel for
+    //#pragma omp for
     for (i = 0; i<block_size; i++) {
         int j;
         for (j = 0; j<block_size; j++) {
             B[j*ldb + i] = A[i*lda + j];
         }
     }
+    //}
 }
 
 void transpose_block_SSE4x4(float *A, float *B, const int n, const int m,
     const int lda, const int ldb, const int block_size)
 {
+    #pragma omp parallel
+    {
     int i;
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < n; i += block_size) {
         int j, i2, j2;
         for (j = 0; j < m; j += block_size) {
@@ -2444,20 +2516,24 @@ void transpose_block_SSE4x4(float *A, float *B, const int n, const int m,
                 for (j2 = j; j2 < max_j2; ++j2) {
                     B[j2*ldb + i2] = A[i2*lda + j2];
                 }
-                }
             }
         }
+    }
+    }
 }
 
 void forward_maxpool_layer_avx(float *src, float *dst, int *indexes, int size, int w, int h, int out_w, int out_h, int c,
     int pad, int stride, int batch)
 {
-    int b, k;
+    int b;
     const int w_offset = -pad / 2;
     const int h_offset = -pad / 2;
 
     for (b = 0; b < batch; ++b) {
-        #pragma omp parallel for
+        #pragma omp parallel
+        {
+        int k;
+        #pragma omp for
         for (k = 0; k < c; ++k) {
             int i, j, m, n;
             for (i = 0; i < out_h; ++i) {
@@ -2481,6 +2557,7 @@ void forward_maxpool_layer_avx(float *src, float *dst, int *indexes, int size, i
                     if (indexes) indexes[out_index] = max_i;
                 }
             }
+        }
         }
     }
 }
@@ -2513,8 +2590,10 @@ void transpose_uint32(uint32_t *src, uint32_t *dst, int src_h, int src_w, int sr
     //l.bit_align - algined (n) by 32
     //new_ldb - aligned (k) by 256
 
+    //#pragma omp parallel
+    //{
     int i;
-    //#pragma omp parallel for
+    //#pragma omp for
     for (i = 0; i < src_h; i += 1)  // l.size*l.size*l.c;
     {
         int j;
@@ -2523,6 +2602,7 @@ void transpose_uint32(uint32_t *src, uint32_t *dst, int src_h, int src_w, int sr
             ((uint32_t *)dst)[j*dst_align / 32 + i] = ((uint32_t *)src)[i*src_align + j];
         }
     }
+    //}
 }
 
 void gemm_nn_bin_transposed_32bit_packed(int M, int N, int K, float ALPHA,
@@ -2531,8 +2611,10 @@ void gemm_nn_bin_transposed_32bit_packed(int M, int N, int K, float ALPHA,
     float *C, int ldc, float *mean_arr)
 {
     (void)ALPHA;
+    #pragma omp parallel
+    {
     int i;
-    #pragma omp parallel for
+    #pragma omp for
     for (i = 0; i < M; ++i) {   // l.n
         int j, s;
         float mean_val = mean_arr[i];
@@ -2551,14 +2633,17 @@ void gemm_nn_bin_transposed_32bit_packed(int M, int N, int K, float ALPHA,
             C[i*ldc + j] += val;
         }
     }
+    }
 }
 
 void convolution_repacked(uint32_t *packed_input, uint32_t *packed_weights, float *output,
     int w, int h, int c, int n, int size, int pad, int new_lda, float *mean_arr)
 {
+    #pragma omp parallel
+    {
     int fil;
     // filter index
-    #pragma omp parallel for
+    #pragma omp for
     for (fil = 0; fil < n; ++fil) {
         float mean_val = mean_arr[fil];
         int chan, y, x, f_y, f_x;   // c_pack
@@ -2616,6 +2701,7 @@ void convolution_repacked(uint32_t *packed_input, uint32_t *packed_weights, floa
                     //        l.weights[filters][channels][filter_width][filter_height];
                     output[output_index] += sum;
                 }
+    }
     }
 }
 
@@ -2691,8 +2777,10 @@ void gemm_cpu(int TA, int TB, int M, int N, int K, float ALPHA,
         gemm_nn_fast(M, N, K, ALPHA, A, lda, B, ldb, C, ldc);
     }
     else {
+        #pragma omp parallel
+        {
         int t;
-        #pragma omp parallel for
+        #pragma omp for
         for (t = 0; t < M; ++t) {
             if (!TA && !TB)
                 gemm_nn(1, N, K, ALPHA, A + t*lda, lda, B, ldb, C + t*ldc, ldc);
@@ -2702,6 +2790,7 @@ void gemm_cpu(int TA, int TB, int M, int N, int K, float ALPHA,
                 gemm_nt(1, N, K, ALPHA, A + t*lda, lda, B, ldb, C + t*ldc, ldc);
             else
                 gemm_tt(1, N, K, ALPHA, A + t, lda, B, ldb, C + t*ldc, ldc);
+        }
         }
     }
 }

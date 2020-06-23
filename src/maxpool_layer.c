@@ -244,9 +244,12 @@ void forward_maxpool_layer(const maxpool_layer l, network_state state)
 {
     if (l.maxpool_depth)
     {
-        int b, i, j, k, g;
+        int b, j, k, g;
         for (b = 0; b < l.batch; ++b) {
-            #pragma omp parallel for
+            #pragma omp parallel
+            {
+            int i;
+            #pragma omp for
             for (i = 0; i < l.h; ++i) {
                 for (j = 0; j < l.w; ++j) {
                     for (g = 0; g < l.out_c; ++g)
@@ -267,6 +270,7 @@ void forward_maxpool_layer(const maxpool_layer l, network_state state)
                         if (l.indexes) l.indexes[out_index] = max_i;
                     }
                 }
+            }
             }
         }
         return;
@@ -328,14 +332,17 @@ void forward_maxpool_layer(const maxpool_layer l, network_state state)
 
 void backward_maxpool_layer(const maxpool_layer l, network_state state)
 {
-    int i;
     int h = l.out_h;
     int w = l.out_w;
     int c = l.out_c;
-    #pragma omp parallel for
+    #pragma omp parallel
+    {
+    int i;
+    #pragma omp for
     for(i = 0; i < h*w*c*l.batch; ++i){
         int index = l.indexes[i];
         state.delta[index] += l.delta[i];
+    }
     }
 }
 

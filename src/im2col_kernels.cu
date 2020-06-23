@@ -1820,9 +1820,11 @@ void gemm_nn_custom_bin_mean_transposed_gpu(int M, int N, int K,
 /*
 void convolve_cpu(float *input, float *weights, float *output, int in_w, int in_h, int in_c, int n, int size, int pad)
 {
+    #pragma omp parallel
+    {
     int fil;
     // filter index
-#pragma omp parallel for      // "omp parallel for" - automatic parallelization of loop by using OpenMP
+    #pragma omp for
     for (fil = 0; fil < n; ++fil) {
         int chan, y, x, f_y, f_x;
         // channel index
@@ -1859,6 +1861,7 @@ void convolve_cpu(float *input, float *weights, float *output, int in_w, int in_
                     output[output_index] += sum;
                 }
     }
+    }
 
 
 }
@@ -1868,9 +1871,11 @@ void convolve_cpu(float *input, float *weights, float *output, int in_w, int in_
 void convolve_bin_cpu(float *input, float *weights, float *output, int in_w, int in_h, int in_c, int n,
     int size, int pad, int new_lda, float *mean_arr_gpu)
 {
+    #pragma omp parallel
+    {
     int fil;
     // filter index
-#pragma omp parallel for      // "omp parallel for" - automatic parallelization of loop by using OpenMP
+    #pragma omp for
     for (fil = 0; fil < n; ++fil) {
         float mean_val = mean_arr_gpu[fil];
         int chan, y, x, f_y, f_x;
@@ -1926,6 +1931,7 @@ void convolve_bin_cpu(float *input, float *weights, float *output, int in_w, int
                     //        l.weights[filters][channels][filter_width][filter_height];
                     output[output_index] += sum*mean_val;
                 }
+    }
     }
 }
 */
