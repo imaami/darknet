@@ -1,1 +1,1 @@
--isystem /usr/include/opencv4 -Wall -Wextra -Werror
+-std=gnu11 -Wall -Wextra -Weverything -Wno-covered-switch-default -fopenmp
