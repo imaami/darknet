@@ -93,9 +93,12 @@ else
   destdir="$(realpath "$(dirname "$0")")/install_$build_type_lc"
 fi
 
-[[ "$cflags"   ]] || cflags="-march=native -mtune=native"
-[[ "$cxxflags" ]] || cxxflags="-march=native -mtune=native"
-[[ "$compiler" ]] || compiler='gcc'
+have_cflags=$((${#cflags} != 0))
+have_cxxflags=$((${#cxxflags} != 0))
+
+(( have_cflags   )) || cflags="-march=native -mtune=native -Wall -Wextra"
+(( have_cxxflags )) || cxxflags="-march=native -mtune=native -Wall -Wextra"
+[[ "$compiler"   ]] || compiler='gcc'
 
 case "$compiler" in
 'clang')
@@ -105,6 +108,8 @@ case "$compiler" in
     [[ "$ar"     ]] || ar="llvm-ar$compiler_version"
     [[ "$ranlib" ]] || ranlib="llvm-ranlib$compiler_version"
   fi
+  (( have_cflags   )) || cflags="$cflags${cflags:+ }-Weverything -Wno-covered-switch-default"
+  (( have_cxxflags )) || cxxflags="$cxxflags${cxxflags:+ }-Weverything -Wno-covered-switch-default -Wno-c++98-compat"
   ;;
 
 'gcc')
