@@ -11,7 +11,10 @@ COST_TYPE get_cost_type(char *s)
 {
     if (strcmp(s, "sse")==0) return SSE;
     if (strcmp(s, "masked")==0) return MASKED;
+    if (strcmp(s, "L1")==0) return L1;
+    if (strcmp(s, "seg")==0) return SEG;
     if (strcmp(s, "smooth")==0) return SMOOTH;
+    if (strcmp(s, "wgan")==0) return WGAN;
     fprintf(stderr, "Couldn't find cost type %s, going with SSE\n", s);
     return SSE;
 }
@@ -23,10 +26,16 @@ char *get_cost_string(COST_TYPE a)
             return "sse";
         case MASKED:
             return "masked";
+        case L1:
+            return "L1";
+        case SEG:
+            return "seg";
         case SMOOTH:
             return "smooth";
-		default:
-			return "sse";
+        case WGAN:
+            return "wgan";
+        default:
+            return NULL;
     }
 }
 

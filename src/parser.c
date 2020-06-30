@@ -59,10 +59,15 @@ LAYER_TYPE string_to_layer_type(char * type)
     if (strcmp(type, "[region]")==0) return REGION;
     if (strcmp(type, "[yolo]") == 0) return YOLO;
     if (strcmp(type, "[Gaussian_yolo]") == 0) return GAUSSIAN_YOLO;
+    if (strcmp(type, "[iseg]") == 0) return ISEG;
     if (strcmp(type, "[local]")==0) return LOCAL;
     if (strcmp(type, "[conv]")==0
             || strcmp(type, "[convolutional]")==0) return CONVOLUTIONAL;
+    if (strcmp(type, "[deconv]")==0
+            || strcmp(type, "[deconvolutional]")==0) return DECONVOLUTIONAL;
     if (strcmp(type, "[activation]")==0) return ACTIVE;
+    if (strcmp(type, "[logistic]") == 0) return LOGXENT;
+    if (strcmp(type, "[l2norm]") == 0) return L2NORM;
     if (strcmp(type, "[net]")==0
             || strcmp(type, "[network]")==0) return NETWORK;
     if (strcmp(type, "[crnn]")==0) return CRNN;

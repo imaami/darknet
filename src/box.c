@@ -154,12 +154,12 @@ float box_iou_kind(box a, box b, IOU_LOSS iou_kind)
     switch(iou_kind) {
         case IOU: return box_iou(a, b);
         case GIOU: return box_giou(a, b);
+        case MSE: break;
         case DIOU: return box_diou(a, b);
         case CIOU: return box_ciou(a, b);
-        default:
-            fprintf(stderr, "%s: Invalid iou_kind: %d\n", __func__, iou_kind);
-            exit(EXIT_FAILURE);
+        default: break;
     }
+    return box_iou(a, b);
 }
 
 float box_iou(box a, box b)
