@@ -198,15 +198,15 @@ char *get_layer_string(LAYER_TYPE a)
         case LSTM:
             return "lstm";
         case CONV_LSTM:
-            break;
+            return "conv_lstm";
         case CRNN:
             return "crnn";
         case MAXPOOL:
             return "maxpool";
         case LOCAL_AVGPOOL:
-            break;
+            return "local_avgpool";
         case REORG:
-            return "reorg";
+            return "reorg3d";
         case AVGPOOL:
             return "avgpool";
         case SOFTMAX:
@@ -214,6 +214,7 @@ char *get_layer_string(LAYER_TYPE a)
         case DETECTION:
             return "detection";
         case NETWORK:
+            return "net";
         case XNOR:
             break;
         case REGION:
@@ -223,7 +224,7 @@ char *get_layer_string(LAYER_TYPE a)
         case GAUSSIAN_YOLO:
             return "Gaussian_yolo";
         case ISEG:
-            break;
+            return "iseg";
         case DROPOUT:
             return "dropout";
         case CROP:
@@ -243,12 +244,19 @@ char *get_layer_string(LAYER_TYPE a)
         case BATCHNORM:
             return "batchnorm";
         case REORG_OLD:
+            return "reorg";
         case UPSAMPLE:
+            return "upsample";
         case LOGXENT:
+            return "logistic";
         case L2NORM:
+            return "l2norm";
         case EMPTY:
+            return "empty";
         case BLANK:
+            return "blank";
         case CONTRASTIVE:
+            return "contrastive";
         default:
             break;
     }
