@@ -124,6 +124,8 @@ __device__ float activate_kernel(float x, ACTIVATION a)
             return hardtan_activate_kernel(x);
         case LHTAN:
             return lhtan_activate_kernel(x);
+        default:
+            break;
     }
     return 0;
 }
@@ -165,6 +167,8 @@ __device__ float gradient_kernel(float x, ACTIVATION a)
         return hardtan_gradient_kernel(x);
     case LHTAN:
         return lhtan_gradient_kernel(x);
+    default:
+        break;
     }
     return 0;
 }

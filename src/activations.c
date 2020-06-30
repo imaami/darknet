@@ -37,6 +37,8 @@ char *get_activation_string(ACTIVATION a)
             return "tanh";
         case PLSE:
             return "plse";
+        case REVLEAKY:
+            return "revleaky";
         case LEAKY:
             return "leaky";
         case STAIR:
@@ -52,10 +54,8 @@ char *get_activation_string(ACTIVATION a)
         case NORM_CHAN_SOFTMAX_MAXVAL:
             return "normalize_channels_softmax_maxval";
         default:
-            fprintf(stderr, "%s: Invalid activation function enum %d\n", __func__, a);
-            break;
+            return NULL;
     }
-    return NULL;
 }
 
 ACTIVATION get_activation(char *s)
@@ -105,6 +105,12 @@ float activate(float x, ACTIVATION a)
             return selu_activate(x);
         case GELU:
             return gelu_activate(x);
+        case SWISH:
+        case MISH:
+        case NORM_CHAN:
+        case NORM_CHAN_SOFTMAX:
+        case NORM_CHAN_SOFTMAX_MAXVAL:
+            break;
         case RELIE:
             return relie_activate(x);
         case RAMP:
@@ -328,6 +334,9 @@ float gradient(float x, ACTIVATION a)
             return selu_gradient(x);
         case GELU:
             return gelu_gradient(x);
+        case SWISH:
+        case MISH:
+            break;
         case RELIE:
             return relie_gradient(x);
         case RAMP:
