@@ -594,7 +594,7 @@ float find_sim(size_t i, size_t j, contrastive_params *contrast_p, int contrast_
         if (contrast_p[z].i == i && contrast_p[z].j == j) break;
     }
     if (z == contrast_p_size) {
-        printf(" Error: find_sim(): sim isn't found: i = %d, j = %d, z = %d \n", i, j, z);
+        printf(" Error: find_sim(): sim isn't found: i = %zu, j = %zu, z = %zu \n", i, j, z);
         getchar();
     }
 
@@ -608,7 +608,7 @@ float find_P_constrastive(size_t i, size_t j, contrastive_params *contrast_p, in
         if (contrast_p[z].i == i && contrast_p[z].j == j) break;
     }
     if (z == contrast_p_size) {
-        printf(" Error: find_P_constrastive(): P isn't found: i = %d, j = %d, z = %d \n", i, j, z);
+        printf(" Error: find_P_constrastive(): P isn't found: i = %zu, j = %zu, z = %zu \n", i, j, z);
         getchar();
     }
 
@@ -619,7 +619,7 @@ float find_P_constrastive(size_t i, size_t j, contrastive_params *contrast_p, in
 float P_constrastive_f(size_t i, size_t l, int *labels, float **z, unsigned int feature_size, float temperature, contrastive_params *contrast_p, int contrast_p_size)
 {
     if (i == l) {
-        fprintf(stderr, " Error: in P_constrastive must be i != l, while i = %d, l = %d \n", i, l);
+        fprintf(stderr, " Error: in P_constrastive must be i != l, while i = %zu, l = %zu \n", i, l);
         getchar();
     }
 
@@ -748,7 +748,7 @@ void grad_contrastive_loss_negative_f(size_t i, int *labels, size_t num_of_sampl
 float P_constrastive(size_t i, size_t l, int *labels, size_t num_of_samples, float **z, unsigned int feature_size, float temperature, float *cos_sim, float *exp_cos_sim)
 {
     if (i == l) {
-        fprintf(stderr, " Error: in P_constrastive must be i != l, while i = %d, l = %d \n", i, l);
+        fprintf(stderr, " Error: in P_constrastive must be i != l, while i = %zu, l = %zu \n", i, l);
         getchar();
     }
 
