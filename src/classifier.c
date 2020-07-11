@@ -143,7 +143,6 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
     int iter_topk = get_current_batch(net);
     float topk = 0;
 
-    int count = 0;
     double start, time_remaining, avg_time = -1, alpha_time = 0.01;
     start = what_time_is_it_now();
 
@@ -187,7 +186,9 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
             }
         }
 
+#ifdef OPENCV
         int draw_precision = 0;
+#endif  // OPENCV
         if (calc_topk && (i >= calc_topk_for_each || i == net.max_batches)) {
             iter_topk = i;
             if (net.contrastive && l.type != SOFTMAX && l.type != COST) {
@@ -200,7 +201,9 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
                 topk = validate_classifier_single(datacfg, cfgfile, weightfile, &net, topk_data); // calc TOP-n
                 printf("\n accuracy %s = %f \n", topk_buff, topk);
             }
+#ifdef OPENCV
             draw_precision = 1;
+#endif  // OPENCV
         }
 
         time_remaining = ((net.max_batches - i) / ngpus) * (what_time_is_it_now() - start) / 60 / 60;
@@ -852,7 +855,6 @@ void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *fi
 
     int i = 0;
     char **names = get_labels(name_list);
-    clock_t time;
     int* indexes = (int*)xcalloc(top, sizeof(int));
     char buff[256];
     char *input = buff;

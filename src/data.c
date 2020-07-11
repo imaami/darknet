@@ -1087,7 +1087,7 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int c, int bo
     d.X.vals = (float**)xcalloc(d.X.rows, sizeof(float*));
     d.X.cols = h*w*c;
 
-    float r1 = 0, r2 = 0, r3 = 0, r4 = 0, r_scale = 0;
+    float r1 = 0, r2 = 0, r3 = 0, r4 = 0;
     float resize_r1 = 0, resize_r2 = 0;
     float dhue = 0, dsat = 0, dexp = 0, flip = 0, blur = 0;
     int augmentation_calculated = 0, gaussian_noise = 0;
@@ -1148,8 +1148,6 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int c, int bo
 
                     flip = use_flip ? random_gen() % 2 : 0;
                 }
-
-                r_scale = random_float();
 
                 dhue = rand_uniform_strong(-hue, hue);
                 dsat = rand_scale(saturation);
@@ -1403,7 +1401,7 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int c, int bo
     d.X.vals = (float**)xcalloc(d.X.rows, sizeof(float*));
     d.X.cols = h*w*c;
 
-    float r1 = 0, r2 = 0, r3 = 0, r4 = 0, r_scale;
+    float r1 = 0, r2 = 0, r3 = 0, r4 = 0;
     float resize_r1 = 0, resize_r2 = 0;
     float dhue = 0, dsat = 0, dexp = 0, flip = 0;
     int augmentation_calculated = 0;
@@ -1448,8 +1446,6 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int c, int bo
 
                     flip = use_flip ? random_gen() % 2 : 0;
                 }
-
-                r_scale = random_float();
 
                 dhue = rand_uniform_strong(-hue, hue);
                 dsat = rand_scale(saturation);

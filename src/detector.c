@@ -64,7 +64,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     char *base = basecfg(cfgfile);
     printf("%s\n", base);
     float avg_loss = -1;
+#ifdef OPENCV
     float avg_contrastive_acc = 0;
+#endif  // OPENCV
     network* nets = (network*)xcalloc(ngpus, sizeof(network));
 
     srand(time(0));
@@ -315,7 +317,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         printf("\n %d: %f, %f avg loss, %f rate, %lf seconds, %d images, %f hours left\n", iteration, loss, avg_loss, get_current_rate(net), (what_time_is_it_now() - time), iteration*imgs, avg_time);
         fflush(stdout);
 
+#ifdef OPENCV
         int draw_precision = 0;
+#endif  // OPENCV
         if (calc_map && (iteration >= next_map_calc || iteration == net.max_batches)) {
             if (l.random) {
                 printf("Resizing to initial size: %d x %d ", init_w, init_h);
@@ -362,7 +366,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
                 save_weights(net, buff);
             }
 
+#ifdef OPENCV
             draw_precision = 1;
+#endif  // OPENCV
         }
         time_remaining = ((net.max_batches - iteration) / ngpus)*(what_time_is_it_now() - time + load_time) / 60 / 60;
         // set initial value, even if resume training from 10000 iteration
@@ -439,18 +445,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 }
 
 
-static int get_coco_image_id(char *filename)
-{
-    char *p = strrchr(filename, '/');
-    char *c = strrchr(filename, '_');
-    if (c) p = c;
-    return atoi(p + 1);
-}
-
 static void print_cocos(FILE *fp, char *image_path, detection *dets, int num_boxes, int classes, int w, int h)
 {
     int i, j;
-    //int image_id = get_coco_image_id(image_path);
     char *p = basecfg(image_path);
     int image_id = atoi(p);
     for (i = 0; i < num_boxes; ++i) {
@@ -563,7 +560,7 @@ static void eliminate_bdd(char *buf, char *a)
             {
                 if (a[++n] == '\0')
                 {
-                    for (k; buf[k + n] != '\0'; k++)
+                    for (; buf[k + n] != '\0'; k++)
                     {
                         buf[k] = buf[k + n];
                     }
@@ -682,9 +679,9 @@ void validate_detector(char *datacfg, char *cfgfile, char *weightfile, char *out
         if (!outfile) outfile = "kitti_results";
         printf("%s\n", outfile);
         snprintf(buff, 1024, "%s/%s", prefix, outfile);
-        int mkd = make_directory(buff, 0777);
+        (void)make_directory(buff, 0777);
         snprintf(buff2, 1024, "%s/%s/data", prefix, outfile);
-        int mkd2 = make_directory(buff2, 0777);
+        (void)make_directory(buff2, 0777);
         kitti = 1;
     }
     else if (0 == strcmp(type, "imagenet")) {
@@ -1313,10 +1310,6 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
 
         printf("class_id = %d, name = %s, ap = %2.2f%%   \t (TP = %d, FP = %d) \n",
             i, names[i], avg_precision * 100, tp_for_thresh_per_class[i], fp_for_thresh_per_class[i]);
-
-        float class_precision = (float)tp_for_thresh_per_class[i] / ((float)tp_for_thresh_per_class[i] + (float)fp_for_thresh_per_class[i]);
-        float class_recall = (float)tp_for_thresh_per_class[i] / ((float)tp_for_thresh_per_class[i] + (float)(truth_classes_count[i] - tp_for_thresh_per_class[i]));
-        //printf("Precision = %1.2f, Recall = %1.2f, avg IOU = %2.2f%% \n\n", class_precision, class_recall, avg_iou_per_class[i]);
 
         mean_average_precision += avg_precision;
     }

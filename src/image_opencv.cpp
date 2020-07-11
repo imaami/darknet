@@ -436,13 +436,6 @@ extern "C" void make_window(char *name, int w, int h, int fullscreen)
 }
 // ----------------------------------------
 
-static float get_pixel(image m, int x, int y, int c)
-{
-    assert(x < m.w && y < m.h && c < m.c);
-    return m.data[c*m.h*m.w + y*m.w + x];
-}
-// ----------------------------------------
-
 extern "C" void show_image_cv(image p, const char *name)
 {
     try {
@@ -923,13 +916,9 @@ extern "C" void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, flo
                 float red = get_color(2, offset, classes);
                 float green = get_color(1, offset, classes);
                 float blue = get_color(0, offset, classes);
-                float rgb[3];
 
                 //width = prob*20+2;
 
-                rgb[0] = red;
-                rgb[1] = green;
-                rgb[2] = blue;
                 box b = dets[i].bbox;
                 if (std::isnan(b.w) || std::isinf(b.w)) b.w = 0.5;
                 if (std::isnan(b.h) || std::isinf(b.h)) b.h = 0.5;

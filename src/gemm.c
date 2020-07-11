@@ -24,7 +24,7 @@
 #define PUT_IN_REGISTER register
 #endif
 
-void gemm_bin(int M, int N, int K, float ALPHA,
+void gemm_bin(int M, int N, int K,
         char  *A, int lda,
         float *B, int ldb,
         float *C, int ldc)
@@ -1049,24 +1049,6 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
         *((__m256*)&weights[i]) = _mm256_and_ps(*((__m256*)&weights[i]), _mm256_castsi256_ps(all256_sing1));
     }
 
-    //for (i = 0; i < w*h*c; i += 8) {
-        //*((__m256*)&input[i]) = _mm256_and_ps(*((__m256*)&input[i]), _mm256_castsi256_ps(all256_sing1));
-    //}
-
-
-    //__m256i all256_last_zero = _mm256_set1_epi32(0xFFFFFFFF);
-    //all256_last_zero.m256i_i32[7] = 0;
-    __m256i all256_last_zero =
-        _mm256_set_epi32(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x0);
-
-    __m256i idx256 = _mm256_set_epi32(0, 7, 6, 5, 4, 3, 2, 1);
-    //__m256 all256_sing1 = _mm256_set1_ps(0x80000000);
-    __m256 all256_one = _mm256_set1_ps(1);
-    __m256i all256i_one = _mm256_set1_epi32(1);
-
-    ///__m256i src256 = _mm256_loadu_si256((__m256i *)(&src[i]));
-    ///__m256i result256 = _mm256_and_si256(src256, all256_sing1); // check sign in 8 x 32-bit floats
-
     int fil;
     // filter index
     #pragma omp parallel for      // "omp parallel for" - automatic parallelization of loop by using OpenMP
@@ -1660,7 +1642,6 @@ void im2col_cpu_custom_bin(float* data_im,
     // optimized version
     if (height_col == height && width_col == width && stride == 1 && pad == 1 && is_fma_avx2())
     {
-        __m256i all256_sing1 = _mm256_set_epi32(0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000, 0x80000000);
         __m256 float_zero256 = _mm256_set1_ps(0.00);
 
         int new_ldb = bit_align;

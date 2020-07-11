@@ -246,7 +246,7 @@ public:
                     //"Content-Type: multipart/x-mixed-replace; boundary=boundary\r\n"
                     "\r\n", 0);
                 _write(client, "[\n", 0);   // open JSON array
-                int n = _write(client, outputbuf, outlen);
+                _write(client, outputbuf, outlen);
                 cerr << "JSON_sender: new client " << client << endl;
             }
             else // existing client, just stream pix

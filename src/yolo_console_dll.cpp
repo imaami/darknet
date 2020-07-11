@@ -180,8 +180,6 @@ std::vector<bbox_t> get_3d_coordinates(std::vector<bbox_t> bbox_vect, cv::Mat xy
 void draw_boxes(cv::Mat mat_img, std::vector<bbox_t> result_vec, std::vector<std::string> obj_names,
     int current_det_fps = -1, int current_cap_fps = -1)
 {
-    int const colors[6][3] = { { 1,0,1 },{ 0,0,1 },{ 0,1,1 },{ 0,1,0 },{ 1,1,0 },{ 1,0,0 } };
-
     for (auto &i : result_vec) {
         cv::Scalar color = obj_id_to_color(i.obj_id);
         cv::rectangle(mat_img, cv::Rect(i.x, i.y, i.w, i.h), color, 2);

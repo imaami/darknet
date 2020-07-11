@@ -1205,11 +1205,6 @@ void free_network(network net)
 #endif
 }
 
-static float relu(float src) {
-    if (src > 0) return src;
-    return 0;
-}
-
 static float lrelu(float src) {
     const float eps = 0.001;
     if (src > eps) return src;
