@@ -32,7 +32,9 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
     int i;
 
     float avg_loss = -1;
+#ifdef OPENCV
     float avg_contrastive_acc = 0;
+#endif  // OPENCV
     char *base = basecfg(cfgfile);
     printf("%s\n", base);
     printf("%d\n", ngpus);
@@ -1284,9 +1286,6 @@ void demo_classifier(char *datacfg, char *cfgfile, char *weightfile, int cam_ind
     int frame_counter = 0;
 
     while(1){
-        struct timeval tval_before, tval_after, tval_result;
-        gettimeofday(&tval_before, NULL);
-
         //image in = get_image_from_stream(cap);
         image in_s, in;
         if (!benchmark) {
@@ -1332,9 +1331,6 @@ void demo_classifier(char *datacfg, char *cfgfile, char *weightfile, int cam_ind
             printf("\rFPS: %.2f \t AVG_FPS = %.2f ", fps, avg_fps);
         }
 
-        //gettimeofday(&tval_after, NULL);
-        //timersub(&tval_after, &tval_before, &tval_result);
-        //float curr = 1000000.f/((long int)tval_result.tv_usec);
         float curr = 1000.f / frame_time_ms;
         if (fps == 0) fps = curr;
         else fps = .9*fps + .1*curr;

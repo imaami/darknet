@@ -282,16 +282,16 @@ int main(int argc, char *argv[])
     }
     else if (argc > 1) filename = argv[1];
 
-    float const thresh = (argc > 5) ? std::stof(argv[5]) : 0.2;
-
     Detector detector(cfg_file, weights_file);
 
     auto obj_names = objects_names_from_file(names_file);
     std::string out_videofile = "result.avi";
+#ifdef OPENCV
+    float const thresh = (argc > 5) ? std::stof(argv[5]) : 0.2;
     bool const save_output_videofile = false;   // true - for history
     bool const send_network = false;        // true - for remote detection
     bool const use_kalman_filter = false;   // true - for stationary camera
-
+#endif // OPENCV
     bool detection_sync = true;             // true - for video-file
 #ifdef TRACK_OPTFLOW    // for slow GPU
     detection_sync = false;

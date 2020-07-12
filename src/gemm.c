@@ -1064,7 +1064,6 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
                 for (x = 0; x < w-8; x+=8)
                 {
                     int const output_index = fil*w*h + y*w + x;
-                    float sum = 0;
                     __m256 sum256 = _mm256_set1_ps(0);
 
                     for (chan = 0; chan < c; ++chan) {
@@ -1089,8 +1088,6 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
                                 int input_index = input_pre_index + input_y*w + input_x;
                                 int weights_index = weights_pre_index + f_y*ksize + f_x;
                                 //if (input_y < 0 || input_y >= h) continue;
-
-                                //sum += input[input_index] * weights[weights_index];
 
                                 __m256 in = *((__m256*)&input[input_index]);
                                 __m256 w = _mm256_set1_ps(weights[weights_index]);
@@ -1117,7 +1114,6 @@ void convolution_2d(int w, int h, int ksize, int n, int c, int pad, int stride,
                     // l.output[filters][width][height] +=
                     //        state.input[channels][width][height] *
                     //        l.weights[filters][channels][filter_width][filter_height];
-                    //output[output_index] += sum;
 
                     sum256 = _mm256_mul_ps(sum256, mean256);
                     //printf("\n cur_mean = %f, sum256 = %f, sum256 = %f, in = %f \n",

@@ -260,17 +260,9 @@ __global__ void activate_array_mish_kernel(float *x, int n, float *activation_in
 {
     int i = (blockIdx.x + blockIdx.y*gridDim.x) * blockDim.x + threadIdx.x;
     if (i < n) {
-        const float MISH_THRESHOLD = 20;
         float x_val = x[i];
         if (activation_input) activation_input[i] = x_val;    // store value before activation
-        //output_gpu[i] = x_val * tanh_activate_kernel(logf(1 + expf(x_val)));
-
-        // Pytorch: https://github.com/thomasbrandon/mish-cuda/blob/master/csrc/mish.h#L17-L20
-        // TF: https://github.com/tensorflow/addons/blob/093cdfa85d334cbe19a37624c33198f3140109ed/tensorflow_addons/custom_ops/activations/cc/kernels/mish_op.h#L40-L49
-        // log1p(x) == log(x + 1)
-        //output_gpu[i] = x_val * tanh_activate_kernel( softplus_kernel(x_val, MISH_THRESHOLD) );
         output_gpu[i] = mish_yashas2(x_val);
-        //output_gpu[i] = mish_njuffa(x_val);
     }
 }
 
