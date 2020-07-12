@@ -98,8 +98,8 @@ jobs:
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
         cmakeBuildType: 'Release'
-        cmakeAppendedArgs: "-DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release"
-        buildWithCMakeArgs: '--target install'
+        cmakeAppendedArgs: "-DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
+        buildWithCMakeArgs: '--target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -138,9 +138,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--target install'
+        buildWithCMakeArgs: '--target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -201,9 +201,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCUDA_VERBOSE_BUILD=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--target install'
+        buildWithCMakeArgs: '--target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -237,9 +237,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DBUILD_AS_CPP:BOOL=TRUE"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DBUILD_AS_CPP:BOOL=TRUE -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--target install'
+        buildWithCMakeArgs: '--target install -v'
 
 
   osx-vcpkg:
@@ -270,8 +270,8 @@ jobs:
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
         cmakeBuildType: 'Release'
-        cmakeAppendedArgs: "-DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release"
-        buildWithCMakeArgs: '--target install'
+        cmakeAppendedArgs: "-DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
+        buildWithCMakeArgs: '--target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -308,9 +308,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--target install'
+        buildWithCMakeArgs: '--target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -344,9 +344,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DBUILD_AS_CPP:BOOL=TRUE"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DBUILD_AS_CPP:BOOL=TRUE -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--target install'
+        buildWithCMakeArgs: '--target install -v'
 
 
   win-vcpkg:
@@ -373,9 +373,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--config Release --target install'
+        buildWithCMakeArgs: '--config Release --target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -439,9 +439,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCUDA_VERBOSE_BUILD=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--config Release --target install'
+        buildWithCMakeArgs: '--config Release --target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -479,9 +479,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--config Release --target install'
+        buildWithCMakeArgs: '--config Release --target install -v'
 
     - uses: actions/upload-artifact@v2
       with:
@@ -519,9 +519,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DBUILD_AS_CPP:BOOL=TRUE"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DBUILD_AS_CPP:BOOL=TRUE -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--config Release --target install'
+        buildWithCMakeArgs: '--config Release --target install -v'
 
 
   win-intlibs-cuda:
@@ -549,9 +549,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCUDA_VERBOSE_BUILD=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--config Release --target install'
+        buildWithCMakeArgs: '--config Release --target install -v'
 
 
   mingw:
@@ -568,9 +568,9 @@ jobs:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         useVcpkgToolchainFile: true
         buildDirectory: '${{ runner.workspace }}/buildDirectory'
-        cmakeAppendedArgs: "-G\"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=Release"
+        cmakeAppendedArgs: "-G\"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON"
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: '--config Release --target install'
+        buildWithCMakeArgs: '--config Release --target install -v'
 
 
   cygwin:
@@ -589,6 +589,6 @@ jobs:
         mkdir buildDirectory
         cd buildDirectory
         path C:\tools\cygwin\bin
-        bash -c 'cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="Release"'
-        bash -c 'cmake --build . --target install -- -j8'
+        bash -c 'cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_VERBOSE_MAKEFILE=ON'
+        bash -c 'cmake --build . --target install -v -- -j8'
       shell: cmd
