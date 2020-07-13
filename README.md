@@ -30,21 +30,22 @@ About Darknet framework: http://pjreddie.com/darknet/
 
 0.  [Improvements in this repository](#improvements-in-this-repository)
 1.  [How to use](#how-to-use-on-the-command-line)
-2.  How to compile on Linux
-    * [Using cmake](#how-to-compile-on-linux-using-cmake)
-    * [Using make](#how-to-compile-on-linux-using-make)
-3.  How to compile on Windows
-    * [Using CMake-GUI](#how-to-compile-on-windows-using-cmake)
-    * [Using vcpkg](#how-to-compile-on-windows-using-vcpkg)
-    * [Legacy way](#how-to-compile-on-windows-legacy-way)
-4.  [Training and Evaluation of speed and accuracy on MS COCO](https://github.com/AlexeyAB/darknet/wiki#training-and-evaluation-of-speed-and-accuracy-on-ms-coco)
-5.  [How to train with multi-GPU:](#how-to-train-with-multi-gpu)
-6.  [How to train (to detect your custom objects)](#how-to-train-to-detect-your-custom-objects)
-7.  [How to train tiny-yolo (to detect your custom objects)](#how-to-train-tiny-yolo-to-detect-your-custom-objects)
-8.  [When should I stop training](#when-should-i-stop-training)
-9.  [How to improve object detection](#how-to-improve-object-detection)
-10.  [How to mark bounded boxes of objects and create annotation files](#how-to-mark-bounded-boxes-of-objects-and-create-annotation-files)
-11. [How to use Yolo as DLL and SO libraries](#how-to-use-yolo-as-dll-and-so-libraries)
+2.  [How to compile](#how-to-compile)
+    * [On Linux](#how-to-compile-on-linux)
+      + [Using cmake](#how-to-compile-on-linux-using-cmake)
+      + [Using make](#how-to-compile-on-linux-using-make)
+    * [On Windows](#how-to-compile-on-windows)
+      + [Using CMake-GUI](#how-to-compile-on-windows-using-cmake)
+      + [Using vcpkg](#how-to-compile-on-windows-using-vcpkg)
+      + [Legacy way](#how-to-compile-on-windows-legacy-way)
+3.  [Training and Evaluation of speed and accuracy on MS COCO](https://github.com/AlexeyAB/darknet/wiki#training-and-evaluation-of-speed-and-accuracy-on-ms-coco)
+4.  [How to train with multi-GPU:](#how-to-train-with-multi-gpu)
+5.  [How to train (to detect your custom objects)](#how-to-train-to-detect-your-custom-objects)
+6.  [How to train tiny-yolo (to detect your custom objects)](#how-to-train-tiny-yolo-to-detect-your-custom-objects)
+7.  [When should I stop training](#when-should-i-stop-training)
+8.  [How to improve object detection](#how-to-improve-object-detection)
+9.  [How to mark bounded boxes of objects and create annotation files](#how-to-mark-bounded-boxes-of-objects-and-create-annotation-files)
+10. [How to use Yolo as DLL and SO libraries](#how-to-use-yolo-as-dll-and-so-libraries)
 
 
 
@@ -280,7 +281,11 @@ Open a bash terminal inside the cloned repository and launch:
 ./build.sh
 ```
 
-### How to compile on Linux (using `make`)
+### How to compile
+
+#### How to compile on Linux
+
+##### How to compile on Linux (using `make`)
 
 Just do `make` in the darknet directory. (You can try to compile and run it on Google Colab in cloud [link](https://colab.research.google.com/drive/12QusaaRj_lUwCGDvQNfICpa7kA7_a2dE) (press «Open in Playground» button at the top-left corner) and watch the video [link](https://www.youtube.com/watch?v=mKAEGSxwOAY) )
 Before make, you can set such options in the `Makefile`: [link](https://github.com/AlexeyAB/darknet/blob/9c1b9a2cf6363546c152251be578a21f3c3caec6/Makefile#L1)
@@ -298,7 +303,9 @@ Before make, you can set such options in the `Makefile`: [link](https://github.c
 
 To run Darknet on Linux use examples from this article, just use `./darknet` instead of `darknet.exe`, i.e. use this command: `./darknet detector test ./cfg/coco.data ./cfg/yolov4.cfg ./yolov4.weights`
 
-### How to compile on Windows (using `CMake`)
+#### How to compile on Windows
+
+##### How to compile on Windows (using `CMake`)
 
 This is the recommended approach to build Darknet on Windows if you have already
 installed Visual Studio 2015/2017/2019, CUDA >= 10.0, cuDNN >= 7.0, and
@@ -310,7 +317,7 @@ Open a Powershell terminal inside the cloned repository and launch:
 .\build.ps1
 ```
 
-### How to compile on Windows (using `vcpkg`)
+##### How to compile on Windows (using `vcpkg`)
 
 1. Install or update Visual Studio to at least version 2017, making sure to have it fully patched (run again the installer if not sure to automatically update to latest version). If you need to install from scratch, download VS from here: [Visual Studio Community](http://visualstudio.com)
 
@@ -327,7 +334,7 @@ PS Code\vcpkg>         .\vcpkg install darknet[full]:x64-windows #replace with d
 
 5. You will find darknet inside the vcpkg\installed\x64-windows\tools\darknet folder, together with all the necessary weight and cfg files
 
-### How to compile on Windows (legacy way)
+##### How to compile on Windows (legacy way)
 
 1. If you have **CUDA 10.0, cuDNN 7.4 and OpenCV 3.x** (with paths: `C:\opencv_3.0\opencv\build\include` & `C:\opencv_3.0\opencv\build\x64\vc14\lib`), then open `build\darknet\darknet.sln`, set **x64** and **Release** https://hsto.org/webt/uh/fk/-e/uhfk-eb0q-hwd9hsxhrikbokd6u.jpeg and do the: Build -> Build darknet. Also add Windows system variable `CUDNN` with path to CUDNN: https://user-images.githubusercontent.com/4096485/53249764-019ef880-36ca-11e9-8ffe-d9cf47e7e462.jpg
 
@@ -360,7 +367,7 @@ PS Code\vcpkg>         .\vcpkg install darknet[full]:x64-windows #replace with d
     
     **Note:** CUDA must be installed only after Visual Studio has been installed.
 
-### How to compile (custom):
+##### How to compile on Windows (custom)
 
 Also, you can to create your own `darknet.sln` & `darknet.vcxproj`, this example for CUDA 9.1 and OpenCV 3.0
 
