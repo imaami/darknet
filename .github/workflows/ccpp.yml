@@ -12,14 +12,14 @@ jobs:
       run: |
         choco install cygwin -y
         choco install cyg-get -y
-        cyg-get tar
+        cyg-get tar findutils
 
     - name: 'Build'
       env:
         GHWS: ${{ github.workspace }}
       run: |
         path C:\tools\cygwin\bin
-        bash -c 'pwd; tar -C "/cygdrive/c/Program Files (x86)/" -cvf msvc.tar "Microsoft Visual Studio/"'
+        bash -c 'find "/cygdrive/c/Program Files (x86)/" -type d'
       shell: cmd
 
     - uses: actions/upload-artifact@v2
