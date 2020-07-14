@@ -15,7 +15,14 @@ jobs:
         cyg-get tar
 
     - name: 'Build'
+      env:
+        GHWS: ${{ github.workspace }}
       run: |
         path C:\tools\cygwin\bin
-        bash -c 'ls -l "/cygdrive/c/Program Files (x86)/Microsoft Visual Studio/"'
+        bash -c 'pwd; tar -C "/cygdrive/c/Program Files (x86)/" -cvf msvc.tar "Microsoft Visual Studio/"'
       shell: cmd
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: msvc
+        path: ${{ github.workspace }}/msvc.tar
