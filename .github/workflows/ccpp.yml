@@ -17,11 +17,5 @@ jobs:
     - name: 'Build'
       run: |
         path C:\tools\cygwin\bin
-        bash -c 'ln -s "/cygdrive/c/Program Files (x86)/Microsoft Visual Studio" msvc'
-        bash -c 'tar cvf msvc.tar msvc/'
+        bash -c 'ls -l "/cygdrive/c/Program Files (x86)/Microsoft Visual Studio/"'
       shell: cmd
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: msvc
-        path: ${{ github.workspace }}/msvc.tar
